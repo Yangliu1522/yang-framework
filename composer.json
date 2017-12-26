@@ -1,0 +1,16 @@
+{
+  "name": "yang/voder",
+  "description": "迷你小框架",
+  "authors": [
+    {
+      "name": "Yangliu1522",
+      "email": "silian666@gmail.com"
+    }
+  ],
+  "require": {},
+  "autoload": {
+    "psr-4": {
+      "yang\\": "yframe/library/yang"
+    }
+  }
+}
