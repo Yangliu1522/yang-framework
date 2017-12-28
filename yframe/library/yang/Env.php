@@ -17,7 +17,7 @@ class Env
     public static $instrace;
     public function __construct()
     {
-
+        return $this;
     }
 
     /**

@@ -14,7 +14,7 @@ class ErrorException extends \Exception
 {
     public $type;
 
-    public function __construct($type = '',$message = "", $code = 0, $file = '', $line = 0, Throwable $previous = null)
+    public function __construct($message = "", $code = 0, $file = '', $line = 0, Throwable $previous = null)
     {
         if (empty($file)) {
             $debug = debug_backtrace()[0];
@@ -22,8 +22,8 @@ class ErrorException extends \Exception
             $line = $debug['line'];
         }
 
-        $this->type = '异常';
-
+        $this->file = $file;
+        $this->line = $line;
 
         parent::__construct($message, $code, $previous);
     }
