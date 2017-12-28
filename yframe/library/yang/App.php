@@ -33,6 +33,9 @@ class App
         return $this;
     }
 
+    /**
+     * 监听应用
+     */
     public static function listen() {
         echo '开始了';
     }
