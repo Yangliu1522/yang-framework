@@ -11,4 +11,6 @@ $root_dir = dirname(__FILE__);
 
 require $root_dir . '/../vendor/autoload.php';
 
+
+\yang\Error::register();
 \yang\App::create();

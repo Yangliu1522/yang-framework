@@ -14,7 +14,7 @@ class App
 {
     private static $instrace;
 
-    public static $app_debug = false;
+    public static $app_debug = true;
 
     /**
      * 创建基础结构

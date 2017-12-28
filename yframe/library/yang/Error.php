@@ -20,24 +20,23 @@ class Error {
 
     public function __construct()
     {
-        if (App::$app_debug) {
+        if (App::$app_debug === true) {
             // 设置php.ini里的内容 这里是打开错误提示
             ini_set('display_errors', 'On');
             // 设置显示的错误级别 E_ALL 就是全部 E_ALL&~E_WARNING 这样就是显示除了warning的错误
             error_reporting(E_ALL);
-
-            // 设置出现异常事调用的函数
-            set_exception_handler([$this, 'exception']);
-            // 设置出现错误时调用的函数
-            set_error_handler([$this, 'error']);
-            // 设置程序结束后执行的错误
-            register_shutdown_function([$this, 'shutdown']);
         } else {
             ini_set('display_errors', 'Off');
         }
+        // 设置出现异常事调用的函数
+        set_exception_handler([$this, 'exception']);
+        // 设置出现错误时调用的函数
+        set_error_handler([$this, 'error']);
+        // 设置程序结束后执行的错误
+        register_shutdown_function([$this, 'shutdown']);
     }
 
-    public function exception(\Exception $e) {
+    public function exception($e) {
         $this->output($e);
     }
 
@@ -48,9 +47,11 @@ class Error {
 
     public function shutdown() {
 
-        if (!is_null($error = error_get_last()) && static::isFatal($error['type'])) {
+        if (!is_null($error = error_get_last()) && $this->isFatal($error['type'])) {
             $exception = new ErrorException($error['type'], $error['message'], $error['file'], $error['line']);
             $this->exception($exception);
+        } else {
+            var_dump($error);
         }
 
     }
@@ -64,10 +65,15 @@ class Error {
     // 输出错误 可以尝试各种错误
     public function output(\Exception $e) {
 
+        // 输出错误信息
         echo $e->getMessage() . '<br>';
+        // 错误码
         echo $e->getCode() . '<br>';
+        // 错误所在文件
         echo $e->getFile() . '<br>';
+        // 错误在文件哪一行
         echo $e->getLine() . '<br>';
+        // 详细的信息
         echo $e->getTraceAsString() . '<br>';
     }
 }

@@ -10,6 +10,9 @@ ini_set('display_errors', 'On');
 error_reporting(E_ALL);
 
 require 'yframe/start.php';
-echo date('Y-m-d H:i:s', time());
+
+
+echo $app;
 
 \yang\App::listen();
+
