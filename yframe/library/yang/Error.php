@@ -40,6 +40,12 @@ class Error {
         $this->output($e);
     }
 
+    /**
+     * @param $erron 错误码
+     * @param $errstr 错误信息
+     * @param $errfile 错误所在文件
+     * @param $errline 错误在文件的哪一行
+     */
     public function error($erron, $errstr, $errfile, $errline) {
         $exception = new ErrorException($errstr, $erron, $errfile, $errline);
         $this->exception($exception);
