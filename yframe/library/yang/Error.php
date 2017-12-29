@@ -24,7 +24,7 @@ class Error {
             // 设置php.ini里的内容 这里是打开错误提示
             ini_set('display_errors', 'On');
             // 设置显示的错误级别 E_ALL 就是全部 E_ALL&~E_WARNING 这样就是显示除了warning的错误
-            error_reporting(E_ALL);
+            error_reporting(~E_ALL);
         } else {
             ini_set('display_errors', 'Off');
         }
@@ -54,10 +54,8 @@ class Error {
     public function shutdown() {
 
         if (!is_null($error = error_get_last()) && $this->isFatal($error['type'])) {
-            $exception = new ErrorException($error['type'], $error['message'], $error['file'], $error['line']);
+            $exception = new ErrorException($error['message'], $error['type'], $error['file'], $error['line']);
             $this->exception($exception);
-        } else {
-            var_dump($error);
         }
 
     }
@@ -69,8 +67,7 @@ class Error {
     }
 
     // 输出错误 可以尝试各种错误
-    public function output(\Exception $e) {
-
+    public function output($e) {
         // 输出错误信息
         echo $e->getMessage() . '<br>';
         // 错误码

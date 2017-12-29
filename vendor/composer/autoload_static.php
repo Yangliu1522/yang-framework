@@ -6,25 +6,9 @@ namespace Composer\Autoload;
 
 class ComposerStaticInita5c632d0e2a433a42d6b6a9e2f984582
 {
-    public static $prefixLengthsPsr4 = array (
-        'y' => 
-        array (
-            'yang\\' => 5,
-        ),
-    );
-
-    public static $prefixDirsPsr4 = array (
-        'yang\\' => 
-        array (
-            0 => __DIR__ . '/../..' . '/yframe/library/yang',
-        ),
-    );
-
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInita5c632d0e2a433a42d6b6a9e2f984582::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInita5c632d0e2a433a42d6b6a9e2f984582::$prefixDirsPsr4;
 
         }, null, ClassLoader::class);
     }

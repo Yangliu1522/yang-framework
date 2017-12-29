@@ -12,7 +12,8 @@ namespace yang;
  */
 class App
 {
-    private static $instrace;
+    // 调用App的内置公共函数
+    public static $instrace;
 
     public static $app_debug = true;
 
@@ -20,25 +21,20 @@ class App
      * 创建基础结构
      */
     public static function create() {
+        self::$app_debug = Env::get('app_debug');
         if (empty(self::$instrace)) {
             self::$instrace = new static();
         }
         echo 'Start';
+        // self::$instrace->start(); 测试一下
     }
-
-    /**
-     * 万物之根本 初始化
-     * App constructor.
-     */
-    public function __construct()
-    {
-        return $this;
-    }
-
     /**
      * 监听应用
      */
     public static function listen() {
+        Loader::deep();
+
+        Loader::base()->setPsr4(Env::get('app_name'), Env::get('app_path'));
         echo '开始了';
     }
 }
