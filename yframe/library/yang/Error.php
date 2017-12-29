@@ -24,7 +24,7 @@ class Error {
             // 设置php.ini里的内容 这里是打开错误提示
             ini_set('display_errors', 'On');
             // 设置显示的错误级别 E_ALL 就是全部 E_ALL&~E_WARNING 这样就是显示除了warning的错误
-            error_reporting(~E_ALL);
+            error_reporting(E_ALL);// 忘了打开
         } else {
             ini_set('display_errors', 'Off');
         }
@@ -37,7 +37,7 @@ class Error {
     }
 
     public function exception($e) {
-        $this->output($e);
+        $this->output($e); // 这里显示 所有的异常都最终指向这个方法
     }
 
     /**
@@ -69,14 +69,14 @@ class Error {
     // 输出错误 可以尝试各种错误
     public function output($e) {
         // 输出错误信息
-        echo $e->getMessage() . '<br>';
+        echo '错误信息是 ' . $e->getMessage() . '<br>';
         // 错误码
-        echo $e->getCode() . '<br>';
+        echo '错误代码是 ' . $e->getCode() . '<br>';
         // 错误所在文件
-        echo $e->getFile() . '<br>';
+        echo '错误文件是 ' . $e->getFile() . '<br>';
         // 错误在文件哪一行
-        echo $e->getLine() . '<br>';
+        echo '错误位置是 ' .$e->getLine() . '<br>';
         // 详细的信息
-        echo $e->getTraceAsString() . '<br>';
+        echo '更多详细内容 ' . $e->getTraceAsString() . '<br>';
     }
 }

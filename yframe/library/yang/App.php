@@ -21,7 +21,7 @@ class App
      * 创建基础结构
      */
     public static function create() {
-        self::$app_debug = Env::get('app_debug');
+        // self::$app_debug = Env::get('app_debug');
         if (empty(self::$instrace)) {
             self::$instrace = new static();
         }
@@ -34,7 +34,7 @@ class App
     public static function listen() {
         Loader::deep();
 
-        Loader::base()->setPsr4(Env::get('app_name'), Env::get('app_path'));
+        Loader::base()->setPsr4(Env::get('app_name') . "\\", Env::get('app_path'));
         echo '开始了';
     }
 }

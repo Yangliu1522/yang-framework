@@ -15,7 +15,7 @@ class Log
     private static $type = [
         'info', 'trace', 'exception', 'debug', 'warning'
     ];
-    public function create() {
+    public static function create() {
         if (empty(self::$serve)) {
             switch (Env::get('log_type')) {
                 case 'file':
@@ -26,20 +26,26 @@ class Log
         return self::$serve;
     }
 
-    public static function recore($name, $value, $type = 'info')
+    public static function recore($name, $value = '', $type = 'info')
     {
-
+        if (!in_array($type, self::$type)) {
+            $type = 'debug';
+        }
+        $type = strtoupper($type);
+        $value = self::convertArray($value);
+        $str = "[{$type}][{$name}] {$value}\n";
+        self::$logs[] = $str;
     }
 
     public static function save() {
-
+        self::create();
     }
 
     public static function write() {
 
     }
 
-    public function convertArray($value) {
+    public static function convertArray($value) {
         if (is_array($value)) {
             return json_encode($value);
         }
