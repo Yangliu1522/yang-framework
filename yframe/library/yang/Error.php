@@ -57,7 +57,7 @@ class Error {
             $exception = new ErrorException($error['message'], $error['type'], $error['file'], $error['line']);
             $this->exception($exception);
         }
-
+        Log::save();
     }
 
     private function isFatal($type)

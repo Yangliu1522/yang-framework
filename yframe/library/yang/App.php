@@ -22,6 +22,7 @@ class App
      */
     public static function create() {
         // self::$app_debug = Env::get('app_debug');
+        Log::recore('DATE', date('Y-m-d H:i:s', time()));
         if (empty(self::$instrace)) {
             self::$instrace = new static();
         }
@@ -32,9 +33,14 @@ class App
      * 监听应用
      */
     public static function listen() {
-        Loader::deep();
-
         Loader::base()->setPsr4(Env::get('app_name') . "\\", Env::get('app_path'));
         echo '开始了';
+
+
+
+        // 请求完毕
+        if (self::$app_debug) {
+            Debug::create('end', 'run end');
+        }
     }
 }

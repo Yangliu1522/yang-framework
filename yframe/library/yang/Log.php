@@ -13,9 +13,9 @@ class Log
     static private $serve;
     private static $logs = [];
     private static $type = [
-        'info', 'trace', 'exception', 'debug', 'warning'
+        'log', 'notice', 'error', 'critical', 'alert', 'debug', 'warning', 'emergency'
     ];
-    public static function create() {
+    private static function create() {
         if (empty(self::$serve)) {
             switch (Env::get('log_type')) {
                 case 'file':
@@ -26,23 +26,27 @@ class Log
         return self::$serve;
     }
 
-    public static function recore($name, $value = '', $type = 'info')
+    public static function recore($name, $value = '', $type = 'log')
     {
         if (!in_array($type, self::$type)) {
-            $type = 'debug';
+            $type = 'log';
         }
         $type = strtoupper($type);
         $value = self::convertArray($value);
-        $str = "[{$type}][{$name}] {$value}\n";
+        $str = "[{$type}][{$name}] {$value}". PHP_EOL;
         self::$logs[] = $str;
     }
 
     public static function save() {
-        self::create();
+        $str = '----------------------------------------' . PHP_EOL;
+        $str = implode('', self::$logs) . $str . PHP_EOL;
+        self::create()->save($str);
+        self::$logs = [];
     }
 
-    public static function write() {
-
+    public static function write($name, $value = '', $type = 'info') {
+        self::recore($name, $value, $type);
+        self::save();
     }
 
     public static function convertArray($value) {

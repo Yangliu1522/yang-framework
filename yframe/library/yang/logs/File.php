@@ -8,6 +8,8 @@
 namespace yang\logs;
 
 
+use yang\ErrorException;
+
 class File implements LogServe
 {
     public $logs = [];
@@ -27,7 +29,7 @@ class File implements LogServe
         $path = date('Ym', $time);
         $path = \yang\Env::get('cache_path') . $path . DIRECTORY_SEPARATOR;
         if (!is_dir($path)) {
-            mkdir($path, 0755, true);
+            mkdir($path, 0755, true) or trigger_error('Permission denied');
         }
         $file = date('dH', $time) . '.log';
         file_put_contents($path . $file, $content, FILE_APPEND);
