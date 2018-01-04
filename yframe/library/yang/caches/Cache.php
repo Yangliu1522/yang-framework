@@ -1,0 +1,35 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: yangyang
+ * Date: 18-1-4
+ * Time: 下午5:04
+ */
+
+namespace yang\caches;
+
+
+class Cache implements CacheServer
+{
+    static private $interface;
+
+    public static function init()
+    {
+        // TODO: Implement init() method.
+        if (empty(self::$interface)) {
+            self::$interface = new static();
+        }
+        return self::$interface;
+    }
+
+    public function createName($name) {
+        $name = trim($name, '.');
+        if (strpos($name, '.')) {
+            $name = explode('.', $name);
+            $name = array_splice($name, 0, 3);
+            $name[2] = md5($name[2]);
+            
+
+        }
+    }
+}
