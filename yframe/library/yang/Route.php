@@ -21,6 +21,7 @@ class Route
      * 创建路由实例化, 并且批量注册路由
      * @param array $route
      * @param Request $request
+     * @return static
      */
     public static function create(array $route, Request $request)
     {
@@ -29,6 +30,7 @@ class Route
             self::$instrace = new static();
             self::$instrace->register($route);
         }
+        return self::$instrace;
     }
 
     /**
@@ -174,20 +176,80 @@ class Route
         self::$instrace->parse_route($route, $callback, 'PUT', $params);
     }
 
-    public function listen()
+    /**
+     * 监听路由
+     * @throws ErrorException
+     */
+    public function listen($base = '')
     {
         $url = self::$request->path();
-
+        if (empty($url)) {
+            $url = $base;
+        }
         foreach (self::$register as $key => $value) {
-            if (strpos($url, $key) === 0) {
+            if (strpos($url, $key . '/') === 0) {
                 if (isset($value['callback'])) {
+                    // $controller = $value['callback'];
+                    $params = ltrim($url, $key . '/');
+                    $method = $value['method'];
+                    if ($method[0] != 'ANY' && !in_array(self::$request->method(), $method)) {
+
+                        Log::recore('HTTP', 'Request method is not really');
+                        if (App::$app_debug) {
+                            throw new ErrorException('请求方式错误');
+                        } else {
+                            // 此处抛出404;
+                            die;
+                        }
+                    }
+
+                    $this->parse_params($params, $value['params']);
+                    $this->run($value['callback']);
                     break;
                 }
                 foreach ($value as $k2 => $v2) {
-                    if (strpos($url, $key . '/' . $k2) === 0) {
+                    if (strpos($url, $key . '/' . $k2 . '/') === 0) {
                         break;
                     }
                 }
+            }
+        }
+
+        $route = explode('/', $url);
+        $callback = implode('/', array_splice($route, 0,3));
+        if (!empty($route)) {
+            $this->parse_params($route, []);
+        }
+        echo $callback;
+    }
+
+    /**
+     * @param $array
+     * @param array $params
+     * @throws ErrorException
+     */
+    private function parse_params($array, $params = []) {
+        $route_params = explode('/', trim($array, '/'));
+
+        if (!empty($params)) {
+            foreach ($params as $key => $reg) {
+                if (preg_match('/' . $reg['reg']. '/', $route_params[0], $match)) {
+                    self::$request->get($key, array_shift($route_params));
+                } else {
+                    if (!isset($reg['shadow'])){
+                        Log::recore('ARGV', $key . ' type error or not found');
+                        throw new ErrorException('参数错误');
+                    }
+                }
+            }
+        }
+
+        if (!empty($route_params)) {
+            for($i = 0; $i < count($route_params) + 1; $i += 2) {
+                if (!isset($route_params[$i + 1])) {
+                    $route_params[$i + 1] = '';
+                }
+                self::$request->get($route_params[$i],$route_params[$i + 1]);
             }
         }
     }

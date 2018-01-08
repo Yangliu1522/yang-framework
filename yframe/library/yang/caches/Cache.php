@@ -22,14 +22,32 @@ class Cache implements CacheServer
         return self::$interface;
     }
 
-    public function createName($name) {
+    public function createName($name)
+    {
         $name = trim($name, '.');
         if (strpos($name, '.')) {
             $name = explode('.', $name);
             $name = array_splice($name, 0, 3);
             $name[2] = md5($name[2]);
-            
-
+            $name = '/' . implode('/', $name);
+        } else {
+            $name = md5($name);
         }
+        return \yang\Env::get('cache_path') . $name . '.php';
+    }
+
+    public function add($name, $value)
+    {
+        // TODO: Implement add() method.
+    }
+
+    public function clear($name = '')
+    {
+        // TODO: Implement clear() method.
+    }
+
+    public function del($name)
+    {
+        // TODO: Implement del() method.
     }
 }

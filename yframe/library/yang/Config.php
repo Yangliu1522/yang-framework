@@ -11,7 +11,9 @@ namespace yang;
 class Config
 {
     static private $configs = [];
-    public static function get($name) {
+
+    public static function get($name)
+    {
         self::parseName($name);
         if (!is_array($name)) {
             return isset(self::$configs[$name]) ? self::$configs[$name] : null;
@@ -33,7 +35,8 @@ class Config
         }
     }
 
-    public static function set($name, $config) {
+    public static function set($name, $config)
+    {
         self::parseName($name);
 
         if (!is_array($name)) {
@@ -47,13 +50,15 @@ class Config
         }
     }
 
-    public static function setAsArray($configs) {
+    public static function setAsArray($configs)
+    {
         foreach ($configs as $key => $val) {
             self::set($key, $val);
         }
     }
 
-    private static function parseName(&$name) {
+    private static function parseName(&$name)
+    {
         $name = trim($name, '.');
         if (strpos($name, '.') != false && substr_count($name, '.') < 3) {
             $name = explode('.', $name, 3);
