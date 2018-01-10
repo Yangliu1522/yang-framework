@@ -39,15 +39,18 @@ class Cache implements CacheServer
     public function add($name, $value)
     {
         // TODO: Implement add() method.
+        //
     }
 
     public function clear($name = '')
     {
         // TODO: Implement clear() method.
+        //
     }
 
     public function del($name)
     {
         // TODO: Implement del() method.
+        //
     }
 }

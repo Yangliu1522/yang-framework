@@ -7,7 +7,7 @@
 
 namespace yang;
 
-
+// 禁止类内实现引入功能
 class Config
 {
     static private $configs = [];
