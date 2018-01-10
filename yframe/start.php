@@ -12,9 +12,13 @@ $start = microtime(true);
 $ds = DIRECTORY_SEPARATOR;
 $root_dir = dirname(__FILE__) . $ds;
 
-require $root_dir . 'library/yang/Loader.php';
+// require $root_dir . 'library/yang/Loader.php';
 // 注册自动加载
-\yang\Loader::base();
+// \yang\Loader::base();
+// 使用fastload 项目用不到那么多的东西
+require $root_dir . 'library/yang/Fastload.php';
+\yang\Fastload::create();
+\yang\Fastload::listen();
 // 开始写配置, 我们要注册array甚至多个
 
 $config = []; // 初始化声明

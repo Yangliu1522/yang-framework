@@ -216,11 +216,34 @@ class Route
         }
 
         $route = explode('/', $url);
-        $callback = implode('/', array_splice($route, 0,3));
+        $callback = array_splice($route, 0,3);
+        // 假如路由不完整时, 如下操作
+        if (count($callback) < 3) {
+            $base = explode('/', $base);
+            $callback = array_reverse($callback);
+            for ($i = 2; $i >= 0; $i --) {
+                $base[$i] = array_shift($callback);
+                if (empty($callback)) break;
+            }
+            $callback = $base;
+        }
         if (!empty($route)) {
             $this->parse_params($route, []);
         }
-        echo $callback;
+        $this->run($callback);
+    }
+
+    private function run($callback) {
+        if (is_string($callback)) {
+            $callback = explode('/', $callback);
+        }
+
+        array_splice($callback,0,0,Env::get('app_name'));
+        array_splice($callback,2,0,'controller');
+
+        $func = array_pop($callback);
+        $class = implode('\\', $callback);
+        return (new $class())->$func();
     }
 
     /**

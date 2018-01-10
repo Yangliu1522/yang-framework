@@ -34,11 +34,17 @@ class App
     }
 
     /**
+     * 创建基础目录结构
+     */
+    private static function createBase() {
+    }
+
+    /**
      * 监听应用
      */
     public static function listen()
     {
-        Loader::base()->setPsr4(Env::get('app_name') . "\\", Env::get('app_path'));
+        Fastload::add(Env::get('app_name') . "\\", Env::get('app_path'));
         self::$route->listen('index/index/index');
         // 请求完毕
         if (self::$app_debug) {

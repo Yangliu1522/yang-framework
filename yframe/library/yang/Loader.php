@@ -401,9 +401,10 @@ class Loader
                 if (isset($this->prefixDirsPsr4[$search])) {
                     foreach ($this->prefixDirsPsr4[$search] as $dir) {
                         $length = $this->prefixLengthsPsr4[$first][$search];
-                        if (file_exists($file = $dir . DIRECTORY_SEPARATOR . substr($logicalPathPsr4, $length))) {
+                        if (is_file($file = $dir . DIRECTORY_SEPARATOR . substr($logicalPathPsr4, $length))) {
                             return $file;
                         }
+                        var_export($file);
                     }
                 }
             }
