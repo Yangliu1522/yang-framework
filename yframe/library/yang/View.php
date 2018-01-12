@@ -23,9 +23,21 @@ class View
     }
 
     public static function fetch($name, $assign = []) {
+        self::load($name);
+        ob_start();
+        self::out();
+        $content = ob_get_clean();
+
+        return $content;
+    }
+
+    private static function load($name) {
         list($tpl_path, $tpl) = self::create()->createFile($name);
-        App::dump($tpl_path, $tpl);
         self::$tpl = Template::load($tpl, $tpl_path);
+    }
+
+    private static function out() {
+        self::$tpl->render();
     }
 
     protected function createFile($name = '') {

@@ -38,6 +38,7 @@ class Error {
 
     public function exception($e) {
         $this->output($e); // 这里显示 所有的异常都最终指向这个方法
+        //die;
     }
 
     /**
@@ -45,9 +46,13 @@ class Error {
      * @param $errstr 错误信息
      * @param $errfile 错误所在文件
      * @param $errline 错误在文件的哪一行
+     * @throws ErrorException
      */
     public function error($erron, $errstr, $errfile, $errline) {
         $exception = new ErrorException($errstr, $erron, $errfile, $errline);
+        if (error_reporting() & $erron) {
+            throw $exception;
+        }
         $this->exception($exception);
     }
 

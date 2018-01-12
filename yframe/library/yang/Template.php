@@ -21,9 +21,7 @@ class Template extends template\SimInterface {
 
     public static function load($file, $tpl_path)
     {
-        if (empty(self::$cache_static)) {
-            self::$cache_static = new self($file, $tpl_path);
-        }
+        self::$cache_static = new self($file, $tpl_path);
         return self::$cache_static;
     }
 
@@ -32,30 +30,43 @@ class Template extends template\SimInterface {
         $this->file_list[] = $file;
         $this->tpl_path = $tpl_path;
         $this->tpl_cache = Env::get('tpl_cache_path');
-
         $this->cache_file = $this->tpl_cache . md5($file) . '.php';
-        if (!file_exists($this->cache_file) || filectime($file) > filectime($this->cache_file)) {
-            $this->content = file_get_contents($file);
-            if (!is_dir(dirname($this->cache_file))) {
-                // $this->cache_content = file_get_contents($this->cache_file);
-                mkdir(dirname($this->cache_file), 0755, true);
+
+        $content = $this->parseCache($file, $this->cache_file);
+        $this->includeCommand($content);
+        if (!empty($this->update_file_list)) {
+            foreach ($this->update_file_list as $tfile => $cfile ) {
+                $this->parseCache($tfile, $cfile);
             }
-            $this->content = $this->includeCommand($this->content);
-            $this->convertContent();
-            $this->addHead();
-            file_put_contents($this->cache_file, $this->content);
-            unset($this->content);
         }
-        return $this->cache_file;
+
+        return $this;
     }
 
+    private function parseCache($file, $cache_file) {
+        if (!file_exists($cache_file) || filectime($file) > filectime($cache_file)) {
+            $content = file_get_contents($file);
+            if (!is_dir(dirname($cache_file))) {
+                // $this->cache_content = file_get_contents($this->cache_file);
+                mkdir(dirname($cache_file), 0755, true);
+            }
+            $content = $this->includeCommand($content);
+            $this->convertContent($content);
+            $this->addHead();
+            file_put_contents($cache_file, $content);
+        }
+    }
+
+    public function render() {
+        Fastload::includeFile($this->cache_file);
+    }
     /**
      * 转换模板内容
      */
-    private function convertContent() {
-        $this->content = $this->showVar($this->content);
-        $this->content = $this->foreachCommand($this->content);
-        $this->content = $this->fallCallback($this->content);
+    private function convertContent(&$content) {
+        $content = $this->showVar($content);
+        $content = $this->foreachCommand($content);
+        $content = $this->fallCallback($content);
     }
 
     public function getContent() {

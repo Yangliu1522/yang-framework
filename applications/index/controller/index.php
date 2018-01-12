@@ -18,6 +18,6 @@ class Index {
     }
 
     public function index() {
-        \yang\View::fetch('index');
+        echo \yang\View::fetch('index');
     }
 }
