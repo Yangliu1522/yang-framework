@@ -33,6 +33,7 @@ class Log
         }
         $type = strtoupper($type);
         $value = self::convertArray($value);
+        $name = strtoupper($name);
         $str = "[{$type}][{$name}] {$value}". PHP_EOL;
         self::$logs[] = $str;
     }

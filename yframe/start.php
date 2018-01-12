@@ -34,7 +34,7 @@ $config['app_path'] = dirname($_SERVER['SCRIPT_FILENAME']) . $ds;
 $config['control_path'] = $config['app_path'] . 'applications' . $ds;
 $config['runtime_path'] = $config['app_path'] . 'runtime' . $ds;
 $config['cache_path'] = $config['runtime_path'] . 'cache' . $ds;
-$config['log_apth'] = $config['runtime_path'] . 'log' . $ds;
+$config['log_path'] = $config['runtime_path'] . 'log' . $ds;
 $config['tpl_cache_path'] = $config['runtime_path'] . 'template' . $ds;
 // 批量注册系统常量
 \yang\Env::setArray($config);

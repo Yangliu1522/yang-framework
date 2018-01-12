@@ -234,6 +234,10 @@ class Route
     }
 
     private function run($callback) {
+        Request::create()->module($callback[0]);
+        Request::create()->action(end($callback));
+        Request::create()->controller($callback[1]);
+
         if (is_string($callback)) {
             $callback = explode('/', $callback);
         }

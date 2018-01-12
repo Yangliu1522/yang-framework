@@ -11,13 +11,16 @@ namespace yang;
 class Debug
 {
     public $starTime, $starMem;
+    static private $createTo;
     public static function create($name, $value) {
-        return new static($name, $value);
+        if (empty(self::$createTo)) {
+            self::$createTo = new static($name, $value);
+        }
+        Log::recore($name, $value, 'debug');
     }
 
     public function __construct($name, $value)
     {
-        Log::recore($name, $value, 'debug');
         Log::recore('Url', $this->getNowUrl(), 'debug');
         Log::recore('UseMemory', $this->getUseMem() . ' kb', 'debug');
         Log::recore('UseTime', $this->getUseTime() . ' s', 'debug');

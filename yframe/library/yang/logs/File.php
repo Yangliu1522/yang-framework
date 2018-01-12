@@ -22,16 +22,19 @@ class File implements LogServe
     /**
      * 返回Log的生成语句
      * @return string
+     * @throws ErrorException
      */
     public function save($content = '')
     {
         $time = time();
         $path = date('Ym', $time);
-        $path = \yang\Env::get('cache_path') . $path . DIRECTORY_SEPARATOR;
+        $path = \yang\Env::get('log_path') . $path . DIRECTORY_SEPARATOR;
         if (!is_dir($path)) {
-            mkdir($path, 0755, true) or trigger_error('Permission denied');
+            if(!mkdir($path, 0755, true)) {
+                throw new \ErrorException('Permission denied');
+            }
         }
-        $file = date('dH', $time) . '.log';
+        $file = date('d', $time) . '.log';
         file_put_contents($path . $file, $content, FILE_APPEND);
     }
 

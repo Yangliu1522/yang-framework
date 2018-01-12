@@ -9,6 +9,6 @@
 // 就是这里
 require 'yframe/start.php';
 \yang\Env::set('app_path', dirname(__FILE__) . '/applications/');
-
+// 开始执行
 \yang\App::listen();
 

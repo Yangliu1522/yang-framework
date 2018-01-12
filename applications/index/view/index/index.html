@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+@include common/header, common/resource;
+
+{{ name }}
+
+@for i in app.app:
+    这里是一个循环
+    测试
+@endfor;
+</body>
+</html>

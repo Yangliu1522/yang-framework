@@ -16,4 +16,8 @@ class Index {
     public function app() {
         echo 'Hello Yang Framework';
     }
+
+    public function index() {
+        \yang\View::fetch('index');
+    }
 }

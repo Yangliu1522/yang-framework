@@ -59,8 +59,8 @@ class App
     {
         $str = func_get_args();
         foreach ($str as $arrrorstring) {
-            $pre = str_replace("''", 'empty', var_export($arrrorstring, true));
-            echo '<p><pre>' . $pre . '</pre></p>';
+            $pre = print_r($arrrorstring, true);
+            echo '<p><pre>' . $pre . '</pre></p>' . PHP_EOL;
         }
     }
 }
