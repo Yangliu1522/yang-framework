@@ -46,12 +46,19 @@ abstract class SimInterface
      * @return mixed
      */
     abstract public function showFunc($content = '');
+
+    /**
+     * 显示函数
+     * @param string $content
+     * @return mixed
+     */
+    abstract public function ifCommand($content = '');
     /**
      * 扩展接口实现
      */
     abstract public function fallCallback($content);
 
-    protected function parseVar($var) {
+    protected function parseVar($var, $use = true) {
         $var = trim($var);
 
         if (strpos($var, '.') !== false) {
@@ -76,7 +83,9 @@ abstract class SimInterface
                 return $name . implode('', $m[0]);
             }, $var);
         } else {
-            $var = '$' . $var;
+            if ($use === false) {
+                $var = '$' . $var;
+            }
         }
 
         return $var;

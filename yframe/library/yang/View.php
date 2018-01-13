@@ -13,7 +13,7 @@ use yang\template\TplLib;
 
 class View
 {
-    static private $view, $tpl;
+    static private $view, $tpl, $assign = [];
     private $tpl_path;
     private static function create() {
         if (empty(self::$view)) {
@@ -24,20 +24,33 @@ class View
 
     public static function fetch($name, $assign = []) {
         self::load($name);
+        self::assign($assign);
         ob_start();
         self::out();
         $content = ob_get_clean();
 
+        self::$tpl = '';
+        self::$assign = [];
         return $content;
     }
 
+    public static function assign($name, $value = '') {
+        if (!empty($name)) {
+            if (is_array($name)) {
+                self::$assign = array_merge(self::$assign, $name);
+            } else {
+                self::$assign[$name] = $value;
+            }
+        }
+    }
     private static function load($name) {
         list($tpl_path, $tpl) = self::create()->createFile($name);
         self::$tpl = Template::load($tpl, $tpl_path);
     }
 
     private static function out() {
-        self::$tpl->render();
+        extract(self::$assign);
+        Fastload::includeFile(self::$tpl->render(), self::$assign);
     }
 
     protected function createFile($name = '') {

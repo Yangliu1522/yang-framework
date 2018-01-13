@@ -43,7 +43,23 @@ trait SimFlag
      * @return mixed
      */
     public function forCommand($content = ''){
-
+        return preg_replace_callback('/@for(?:[\s])([\w\W]*?)as(?:[\s])([\d]+)\.([<\d>]*)\.([\d]+?)(?:[\s]*)do|@endfor;/is', function ($match) {
+            if (strpos($match[0],'@endfor') === 0) {
+                return '<?php endfor; ?>';
+            }
+            $var = $this->parseVar($match[1]);
+            $left = $match[2];
+            $right = $match[4];
+            $c = empty($match[3]) ? '++' : '= ' . trim($match[3], '<>');
+            if (strpos($match[3], '>') !== false) {
+                $c = '+' . $c;
+                $ar = '<';
+            } else {
+                $c = '-' . $c;
+                $ar = '>';
+            }
+            return '<?php' . " for ({$var} = {$left};{$var}{$ar}{$right};{$var}{$c};):". ' ?>';
+        }, $content);
     }
 
     /**
@@ -52,6 +68,25 @@ trait SimFlag
      * @return mixed
      */
     public function setCommand($content = ''){
+        return preg_replace_callback('/@var(?:[\s]*)([\w\W]*?);/i', function ($match) {
+            $condition = '""';
+            if (strpos($match[1], '=')) {
+                $var = explode('=', $match[1]);
+                $condition = end($var);
+                $var = $this->parseVar($var[0]);
+            } else {
+                $var = $this->parseVar($match[1]);
+            }
+
+            return '<?php ' . $var . ' = ' . $condition . '; ?>';
+        }, $content);
+    }
+
+    /**
+     * if elseif else 语句
+     * @param string $content
+     */
+    public function ifCommand($content = '') {
 
     }
 

@@ -154,8 +154,11 @@ class Fastload
      * 引入文件, 全局
      * @param $file
      */
-    public static function includeFile($file)
+    public static function includeFile($file, $assign = [])
     {
+        if (!empty($assign)) {
+            extract($assign);
+        }
         include $file;
     }
 

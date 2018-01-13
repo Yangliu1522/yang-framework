@@ -18,6 +18,16 @@ class Index {
     }
 
     public function index() {
-        echo \yang\View::fetch('index');
+        $html ='isset($app["app"]) === app_app:';
+
+        $this->forCommand($html);
+
+        // echo \yang\View::fetch('index', ['name' => '洋洋', 'app' => ['app' => [1,2,3,4,5]]]);
+    }
+
+    public function forCommand($content = ''){
+        return preg_replace_callback('/(?![\$\'">])[a-zA-Z0-9_](?>\w*)+(?![\("\'\=\+\-\#\%\/\[\{|,\?])/is', function ($match) {
+            \yang\App::dump($match);
+        }, $content);
     }
 }

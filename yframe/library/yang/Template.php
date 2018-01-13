@@ -44,33 +44,32 @@ class Template extends template\SimInterface {
     }
 
     private function parseCache($file, $cache_file) {
+        $content = file_get_contents($file);
         if (!file_exists($cache_file) || filectime($file) > filectime($cache_file)) {
-            $content = file_get_contents($file);
             if (!is_dir(dirname($cache_file))) {
                 // $this->cache_content = file_get_contents($this->cache_file);
                 mkdir(dirname($cache_file), 0755, true);
             }
-            $content = $this->includeCommand($content);
             $this->convertContent($content);
-            $this->addHead();
+            $this->addHead($content);
             file_put_contents($cache_file, $content);
+            return true;
         }
+        $this->includeCommand($content);
     }
 
     public function render() {
-        Fastload::includeFile($this->cache_file);
+        return $this->cache_file;
     }
     /**
      * 转换模板内容
      */
     private function convertContent(&$content) {
+        $content = $this->includeCommand($content);
         $content = $this->showVar($content);
         $content = $this->foreachCommand($content);
+        $content = $this->setCommand($content);
         $content = $this->fallCallback($content);
-    }
-
-    public function getContent() {
-        return $this->content;
     }
 
     public function includeCommand($content = '')
@@ -91,9 +90,9 @@ class Template extends template\SimInterface {
         }, $content);
     }
 
-    private function addHead() {
-        $html = '<?php if (defined(\'YY_TEMP\')) exit; ?>'.PHP_EOL;
-        $this->content = $html . $this->content;
+    private function addHead(&$content) {
+        $html = '<?php if (!defined(\'YF_TEMP\')) exit; ?>'.PHP_EOL;
+        $content = $html . $content;
     }
 
     private function convertFile($file)

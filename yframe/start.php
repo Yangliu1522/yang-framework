@@ -5,7 +5,8 @@
  * Time  : 下午3:43
  */
 
-// 这里是 开始文件
+define('YF_TEMP', true);
+
 $startMem = memory_get_usage();
 $start = microtime(true);
 // 表示系统路径分隔符

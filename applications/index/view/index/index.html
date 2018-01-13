@@ -1,19 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
 
 @include common/header, common/resource;
 
 {{ name }}
 
+@var apps = '洋洋无敌可爱';
+
+{{ apps }}
+
 @for i in app.app:
     这里是一个循环
-    测试
-    测试
     测试
 @endfor;
 </body>
