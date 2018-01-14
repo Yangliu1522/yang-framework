@@ -9,27 +9,37 @@
 namespace yang\template;
 
 // 自定义函数
+use yang\App;
+
 trait SimParse
 {
     /**
      * 扩展接口实现
      */
     public function fallCallback($content){
-        $reg = '/\{%(?:[\s])([\w\._]*)(?>(.*?)(?:[\s])%})|(?:[\s])(end[\w\._]*?)(?:[\s])%\}/is';
+        $reg = '/\{%(?:[\s])([\w\._\:]*)(?>(.*?)(?:[\s])%})|(?:[\s])(end[\w\._]*?)(?:[\s])%\}/is';
         $end = '';
-        $regex = '/\{%(?:[\s])([\w\._]*)\b(?>(?:(?!%\}).)*|\/(end[\w\._]*))(?:[\s])%\}/is';
         return preg_replace_callback($reg, function ($r) use (&$end) {
             if (strpos($r[1], 'end') === 0) {
-                return $end;
+                $content = $end;
+                $end = '';
+                return $content;
             }
-            $replace = $this->parseFindstr($r[2], '####CONTENT#####');
-            $replace = explode('####CONTENT#####',$replace);
+            $replace = $this->parseCall($r[1], $r[2], '####CONTENT####');
+            $replace = explode('####CONTENT####',$replace);
             $end = end($replace);
             return $replace[0];
         }, $content);
     }
 
-    public function parseFindstr($tag, $content) {
-        return '<?php findstr("' .$tag. '"' . $content .'); ?>';
+    public function parseCall($name, $argstring, $content) {
+        $namespace = __NAMESPACE__ . '\\tplfunc\\';
+        $class = 'cli';
+        if (strpos($name, ':') !== false) {
+            list($class, $name) = explode(':', $name, 2);
+        }
+        $class = $namespace . $class;
+        return call_user_func([new $class, $name], $argstring, $content);
+        // return '<?php findstr("' .$tag. '"' . $content .');';
     }
 }

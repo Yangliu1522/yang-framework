@@ -9,6 +9,8 @@
 namespace yang\template;
 
 // 指令实现
+use yang\App;
+
 trait SimFlag
 {
     use SimParse;
@@ -19,6 +21,9 @@ trait SimFlag
      */
     public function foreachCommand($content = ''){
         return preg_replace_callback('/@for(?:[\s])([\w\W]*?)in(?:[\s])([\w\W]*?)(?:[\s]*)\:|@endfor;/is', function ($match) {
+            if (isset($this->cahce_all[md5($match[0])])) {
+                return $this->cahce_all[md5($match[0])];
+            }
             if (strpos($match[0],'@endfor') === 0) {
                 return '<?php endforeach;endif; ?>';
             }
@@ -33,7 +38,9 @@ trait SimFlag
             $match[2] = $this->parseVar($match[2]);
             // 转换变量
             //end
-            return '<?php if(is_array('.$match[2].')): $__LIST__ = ' . $match[2] . ';foreach ($__LIST__ as ' .$match[1]. '): ?>';
+            $return = '<?php if(is_array('.$match[2].')): $__LIST__ = ' . $match[2] . ';foreach ($__LIST__ as ' .$match[1]. '): ?>';
+            $this->cahce_all[md5($match[0])] = $return;
+            return $return;
         }, $content);
     }
 
@@ -44,6 +51,9 @@ trait SimFlag
      */
     public function forCommand($content = ''){
         return preg_replace_callback('/@for(?:[\s])([\w\W]*?)as(?:[\s])([\d]+)\.([<\d>]*)\.([\d]+?)(?:[\s]*)do|@endfor;/is', function ($match) {
+            if (isset($this->cahce_all[md5($match[0])])) {
+                return $this->cahce_all[md5($match[0])];
+            }
             if (strpos($match[0],'@endfor') === 0) {
                 return '<?php endfor; ?>';
             }
@@ -58,7 +68,9 @@ trait SimFlag
                 $c = '-' . $c;
                 $ar = '>';
             }
-            return '<?php' . " for ({$var} = {$left};{$var}{$ar}{$right};{$var}{$c};):". ' ?>';
+            $return = '<?php' . " for ({$var} = {$left};{$var}{$ar}{$right};{$var}{$c};):". ' ?>';
+            $this->cahce_all[md5($match[0])] = $return;
+            return $return;
         }, $content);
     }
 
@@ -69,6 +81,9 @@ trait SimFlag
      */
     public function setCommand($content = ''){
         return preg_replace_callback('/@var(?:[\s]*)([\w\W]*?);/i', function ($match) {
+            if (isset($this->cahce_all[md5($match[0])])) {
+                return $this->cahce_all[md5($match[0])];
+            }
             $condition = '""';
             if (strpos($match[1], '=')) {
                 $var = explode('=', $match[1]);
@@ -78,7 +93,9 @@ trait SimFlag
                 $var = $this->parseVar($match[1]);
             }
 
-            return '<?php ' . $var . ' = ' . $condition . '; ?>';
+            $return = '<?php ' . $var . ' = ' . $condition . '; ?>';
+            $this->cahce_all[md5($match[0])] = $return;
+            return $return;
         }, $content);
     }
 
@@ -87,7 +104,31 @@ trait SimFlag
      * @param string $content
      */
     public function ifCommand($content = '') {
-
+        return preg_replace_callback('/@if(?:[\s])(.*?):|@elseif(?:[\s])(.*?):|@else:|@endif;/is', function ($match) {
+            if (isset($this->cahce_all[md5($match[0])])) {
+                return $this->cahce_all[md5($match[0])];
+            }
+            if (strpos($match[0],'@endif') === 0) {
+                return '<?php endif; ?>';
+            }
+            if (strpos($match[0],'@else:') === 0) {
+                return '<?php else: ?>';
+            }
+            if (strpos($match[0],'@else') === 0) {
+                $condition = $this->parseVar($match[2], true);
+                $condition = $this->parseCondition($condition);
+                $condition = $this->parseConditionVar($condition);
+                $return = '<?php elseif ('.$condition.'): ?>';
+                $this->cahce_all[md5($match[0])] = $return;
+                return $return;
+            }
+            $condition = $this->parseVar($match[1], true);
+            $condition = $this->parseCondition($condition);
+            $condition = $this->parseConditionVar($condition);
+            $return = '<?php if ('.$condition.'): ?>';
+            $this->cahce_all[md5($match[0])] = $return;
+            return $return;
+        }, $content);
     }
 
     /**
@@ -97,7 +138,12 @@ trait SimFlag
      */
     public function showVar($content = ''){
         return preg_replace_callback('/\{\{(?:[\s])(.*?)(?:[\s])\}\}/i', function ($m) {
-            return '<?php echo ' . trim($this->parseFunc($this->parseVar($m[1]))) . '; ?>';
+            if (isset($this->cahce_all[md5($m[0])])) {
+                return $this->cahce_all[md5($m[0])];
+            }
+            $return = '<?php echo ' . trim($this->parseFunc($this->parseVar($m[1]))) . '; ?>';
+            $this->cahce_all[md5($m[0])] = $return;
+            return $return;
         }, $content);
     }
 

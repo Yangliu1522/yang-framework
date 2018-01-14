@@ -86,6 +86,12 @@ class Fastload
      */
     public function load($class)
     {
+        // 转换类名为大写, 规范
+        if (preg_match('/\\\([a-z0-9]+)$/', $class)) {
+            $class = preg_replace_callback('/\\\([a-z0-9]+)$/', function ($match) {
+                return '\\' . ucfirst($match[1]);
+            }, $class);
+        }
         if ($file = $this->find($class)) {
             self::includeFile($file);
             return true;

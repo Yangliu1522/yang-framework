@@ -11,65 +11,23 @@ namespace yang\template;
 // 规定模仿接口需要实现的功能
 abstract class SimInterface
 {
-    protected $cache = [];
-    /**
-     * foreach方法
-     * @param string $content
-     * @return mixed
-     */
-    abstract public function foreachCommand($content = '');
+    protected $cahce = [], $cache_all = [];
 
-    /**
-     * for方法
-     * @param string $content
-     * @return mixed
-     */
-    abstract public function forCommand($content = '');
-
-    /**
-     * 设置变量
-     * @param string $content
-     * @return mixed
-     */
-    abstract public function setCommand($content = '');
-
-    /**
-     * 显示变量
-     * @param string $content
-     * @return mixed
-     */
-    abstract public function showVar($content = '');
-
-    /**
-     * 显示函数
-     * @param string $content
-     * @return mixed
-     */
-    abstract public function showFunc($content = '');
-
-    /**
-     * 显示函数
-     * @param string $content
-     * @return mixed
-     */
-    abstract public function ifCommand($content = '');
-    /**
-     * 扩展接口实现
-     */
-    abstract public function fallCallback($content);
-
-    protected function parseVar($var, $use = true) {
+    protected function parseVar($var, $use = false) {
         $var = trim($var);
 
         if (strpos($var, '.') !== false) {
             $var = preg_replace_callback('/[a-zA-Z_](?>\w*)(?:[:\.][0-9a-zA-Z_](?>\w*))+/i', function ($m) {
+                if (isset($this->cahce[$m[0]])) {
+                    return $this->cahce[$m[0]];
+                }
                 if (strpos($m[0], '.') === false) {
                     return '$' . $m[0];
                 }
-                $m[0] = explode('.', $m[0]);
-                $name = '$' . array_shift($m[0]);
+                $m[1] = explode('.', $m[0]);
+                $name = '$' . array_shift($m[1]);
 
-                foreach ($m[0] as &$p) {
+                foreach ($m[1] as &$p) {
                     if (strpos($p, '[\'') === 0 || strpos($p, '\']') !== false) {
                         continue;
                     }
@@ -80,14 +38,14 @@ abstract class SimInterface
 
                     $p = "['{$p}']";
                 }
-                return $name . implode('', $m[0]);
+                $this->cahce[$m[0]] = $name . implode('', $m[1]);
+                return $this->cahce[$m[0]];
             }, $var);
         } else {
             if ($use === false) {
                 $var = '$' . $var;
             }
         }
-
         return $var;
     }
 
@@ -118,5 +76,24 @@ abstract class SimInterface
         }
 
         return $var;
+    }
+
+    protected function parseCondition($condition) {
+        return str_replace([
+            ' and ', ' not ', ' or ', ' is ',
+        ], [' && ',' != ',' || ', ' == '], $condition);
+    }
+
+    protected function parseConditionVar($condition) {
+        return preg_replace_callback('/(?![\$\'">])[a-zA-Z0-9_](?>\w*)+(?![\("\'\=\+\-\#\%\/\[\{|,\?])/is', function ($match) {
+            if (isset($this->cahce[$match[0]])) {
+                return $this->cahce[$match[0]];
+            }
+            if (in_array($match[0], ['true','false'])) {
+                return trim($match[0], '$');
+            }
+            $this->cahce[$match[0]] = '$' . trim($match[0]);
+            return $this->cahce[$match[0]];
+        }, $condition);
     }
 }

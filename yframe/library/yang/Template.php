@@ -69,6 +69,7 @@ class Template extends template\SimInterface {
         $content = $this->showVar($content);
         $content = $this->foreachCommand($content);
         $content = $this->setCommand($content);
+        $content = $this->ifCommand($content);
         $content = $this->fallCallback($content);
     }
 
@@ -76,6 +77,9 @@ class Template extends template\SimInterface {
     {
         return preg_replace_callback('/@include\s+([\w\W]*?)(?:[\s]*);/i', function ($mathc) {
             // 此处不做结尾逗号的清理
+            if (isset($this->cahce_all[md5($mathc[0])])) {
+                return $this->cahce_all[md5($mathc[0])];
+            }
             $file = $mathc[1];
             if (strpos($file, ',')) {
                 $contents = '<?php' . PHP_EOL;
@@ -83,9 +87,12 @@ class Template extends template\SimInterface {
                 foreach ($file as $f) {
                     $contents .= 'include \'' . $this->convertFile($f) . '\';' . PHP_EOL;
                 }
-                return $contents . '?>' . PHP_EOL;
+                $contents .= '?>' . PHP_EOL;
+                $this->cahce_all[md5($mathc[0])] = $contents;
+                return $contents;
             } else {
-                return '<?php include \'' . $this->convertFile($file) . '\'; ?>' . PHP_EOL;
+                $this->cahce_all[md5($mathc[0])] = '<?php include \'' . $this->convertFile($file) . '\'; ?>' . PHP_EOL;
+                return $this->cache_all;
             }
         }, $content);
     }

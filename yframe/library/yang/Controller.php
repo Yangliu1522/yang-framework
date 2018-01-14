@@ -17,7 +17,11 @@ class Controller {
         $this->request = Request::create();
     }
 
-    public function display() {
+    public function display($name, $assign = []) {
+        return View::fetch($name, $assign);
+    }
 
+    public function assign($name, $value) {
+        View::assign($name, $value);
     }
 }
