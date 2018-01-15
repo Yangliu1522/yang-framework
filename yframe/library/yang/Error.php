@@ -8,6 +8,8 @@
 namespace yang;
 
 
+use yang\exception\Handle;
+
 class Error {
 
     static private $interface;
@@ -62,6 +64,7 @@ class Error {
             $exception = new ErrorException($error['message'], $error['type'], $error['file'], $error['line']);
             $this->exception($exception);
         }
+        echo $error;
         Log::save();
     }
 
@@ -73,15 +76,7 @@ class Error {
 
     // 输出错误 可以尝试各种错误
     public function output($e) {
-        // 输出错误信息
-        echo '错误信息是 ' . $e->getMessage() . '<br>';
-        // 错误码
-        echo '错误代码是 ' . $e->getCode() . '<br>';
-        // 错误所在文件
-        echo '错误文件是 ' . $e->getFile() . '<br>';
-        // 错误在文件哪一行
-        echo '错误位置是 ' .$e->getLine() . '<br>';
-        // 详细的信息
-        echo '更多详细内容 ' . $e->getTraceAsString() . '<br>';
+        $handle = new Handle($e);
+        $handle->render();
     }
 }

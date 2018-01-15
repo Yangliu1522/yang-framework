@@ -204,7 +204,7 @@ class Route
                     }
 
                     $this->parse_params($params, $value['params']);
-                    $this->run($value['callback']);
+                    return $this->run($value['callback']);
                     break;
                 }
                 foreach ($value as $k2 => $v2) {
@@ -230,7 +230,7 @@ class Route
         if (!empty($route)) {
             $this->parse_params($route, []);
         }
-        $this->run($callback);
+        return $this->run($callback);
     }
 
     private function run($callback) {

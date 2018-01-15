@@ -11,18 +11,35 @@ namespace yang;
 
 class Response {
     private static $inter;
+    private $content = '',
+    $code = 200,
+    $headers = [],
+    $options = [];
     public static function create($content, $code = '200', $headers = [], $options = []) {
         if (empty(self::$inter)) {
             self::$inter = new static();
         }
-        self::$inter->start($content, $code, $headers, $options)
+        self::$inter->start($content, $code, $headers, $options);
+        return self::$inter;
     }
 
     public function start($content, $code = '200', $headers = [], $options = []) {
-        $this->content = $content;
+        $this->content = $this->convert($content);
         $this->code    = $code;
         $this->headers = $headers;
         $this->options = $options;
+    }
+
+    public function send() {
+        http_response_code($this->code);
+        if (!empty($this->headers)) {
+            foreach ($this->headers as $key => $val) {
+                header($key . ":" . $val);
+            }
+        }
+        echo $this->content;
+        ob_flush();
+        fastcgi_finish_request();
     }
 
     private function convert($content) {
@@ -34,6 +51,10 @@ class Response {
                 }
             case 'object':
                 $content = get_object_vars($content);
+                return json_encode($content);
+            case 'string':
+            default:
+                return $content;
 
         }
     }
