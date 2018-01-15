@@ -16,7 +16,7 @@ class Fastload
     private static $prefixDir = [];
     private static $all = [];
     private static $Filelist = [];
-    private $classmap = [], $missclass = [];
+    private $classmap = [], $missclass = [], $class_alias = [];
     private static $instrace;
 
     /**
@@ -76,7 +76,7 @@ class Fastload
      */
     public static function listen()
     {
-        spl_autoload_register([self::create(), 'load']);
+        spl_autoload_register([self::create(), 'load'],true, true);
     }
 
     /**
@@ -92,6 +92,11 @@ class Fastload
                 return '\\' . ucfirst($match[1]);
             }, $class);
         }
+
+        if (isset($this->class_alias[$class])) {
+            return class_alias($this->class_alias[$class], $class);
+        }
+
         if ($file = $this->find($class)) {
             self::includeFile($file);
             return true;
@@ -105,7 +110,6 @@ class Fastload
      */
     private function find($class)
     {
-
         if (isset($this->classMap[$class])) {
             return $this->classmap[$class];
         }
@@ -120,8 +124,12 @@ class Fastload
             $this->missclass[$class] = true;
             return false;
         }
-
         $this->classmap[$class] = $file;
+        if (strpos($class, 'yang\\') === 0) {
+            $class_a = str_replace('yang\\', '', $class);
+            $this->class_alias[$class_a] = $class;
+            // class_alias($this->classmap[$class], $class);
+        }
         return $file;
     }
 
@@ -149,7 +157,6 @@ class Fastload
                         if (file_exists($file = $dir . DIRECTORY_SEPARATOR . substr($logicalPathPsr4, $length))) {
                             return $file;
                         }
-                        echo $file;
                     }
                 }
             }
