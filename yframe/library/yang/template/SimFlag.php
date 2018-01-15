@@ -141,7 +141,7 @@ trait SimFlag
             if (isset($this->cahce_all[md5($m[0])])) {
                 return $this->cahce_all[md5($m[0])];
             }
-            $return = '<?php echo ' . trim($this->parseFunc($this->parseVar($m[1]))) . '; ?>';
+            $return = '<?php echo htmlentities(' . trim($this->parseFunc($this->parseVar($m[1]))) . '); ?>';
             $this->cahce_all[md5($m[0])] = $return;
             return $return;
         }, $content);
