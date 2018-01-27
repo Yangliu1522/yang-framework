@@ -21,7 +21,7 @@ class App implements \ArrayAccess
 
     public $container;
 
-    public function __construct($app = null, $name = '')
+    public function __construct()
     {
         $this->container = Container::getInstance();
     }
@@ -38,7 +38,7 @@ class App implements \ArrayAccess
             self::$instrace = new static();
         }
         self::$request = $request !== null ? $request : Request::create();
-        self::$route = Route::create([], self::$request);
+        self::$route = $this->route->create([], self::$request);
         // self::$instrace->start(); 测试一下
     }
 

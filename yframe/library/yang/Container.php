@@ -36,12 +36,11 @@ class Container
     }
 
     public static function get($name, $vars = [], $establishNew = false) {
-        Common::dump($name);
         return self::getInstance()->make($name, $vars, $establishNew);
     }
 
     public function make($name, $vars = [], $establishNew = false) {
-        Common::dump($name);
+        $name = strtolower($name);
         if (is_bool($vars)) {
             $establishNew = $vars;
             $vars = [];

@@ -41,7 +41,22 @@ $config['log_path'] = $config['runtime_path'] . 'log' . $ds;
 $config['tpl_cache_path'] = $config['runtime_path'] . 'template' . $ds;
 
 \yang\Container::register([
+    'app' => \yang\App::class,
+    'env' => \yang\Env::class,
+    'config' => \yang\Config::class,
+    'cache' => \yang\Cache::class,
+    'debug' => \yang\Debug::class,
+    'log' => \yang\Log::class,
+    'route' => \yang\Route::class,
+]);
+
+\yang\Fastload::alise([
     'App' => \yang\App::class,
+    'Env' => \yang\Env::class,
+    'Config' => \yang\Config::class,
+    'Cache' => \yang\Cache::class,
+    'Debug' => \yang\Debug::class,
+    'Log' => \yang\Log::class,
 ]);
 // 批量注册系统常量
 \yang\Env::setArray($config);

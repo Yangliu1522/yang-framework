@@ -23,7 +23,7 @@ class Route
      * @param Request $request
      * @return static
      */
-    public static function create(array $route, Request $request)
+    public function create(array $route, Request $request)
     {
         self::$request = $request;
         if (empty(self::$instrace)) {

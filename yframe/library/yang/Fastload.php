@@ -15,8 +15,8 @@ class Fastload
     private static $prefixDir = [];
     private static $all = [];
     private static $Filelist = [];
-    private $classmap = [], $missclass = [], $class_alias = [];
-    private static $instrace;
+    private $classmap = [], $missclass = [];
+    private static $instrace, $class_alias = [];
 
     /**
      * 创建实例化
@@ -47,6 +47,22 @@ class Fastload
             }
             self::$prefixAll[$pre[0]][$pre] = $length;
             self::$prefixDir[$pre] = $path;
+        }
+    }
+
+    /**
+     * 注册alise
+     * @param $pre
+     * @param string $path
+     */
+    public static function alise($flag, $class = '')
+    {
+        if (is_array($flag)) {
+            foreach ($flag as $name => $classname) {
+                self::$class_alias[$name] = $classname;
+            }
+        } else {
+            self::$class_alias[$flag] = $class;
         }
     }
 
@@ -92,8 +108,8 @@ class Fastload
             }, $class);
         }
 
-        if (isset($this->class_alias[$class])) {
-            return class_alias($this->class_alias[$class], $class);
+        if (isset(self::$class_alias[$class])) {
+            return class_alias(self::$class_alias[$class], $class);
         }
 
         if ($file = $this->find($class)) {
@@ -124,11 +140,6 @@ class Fastload
             return false;
         }
         $this->classmap[$class] = $file;
-        if (strpos($class, 'yang\\') === 0) {
-            $class_a = str_replace('yang\\', '', $class);
-            $this->class_alias[$class_a] = $class;
-            // class_alias($this->classmap[$class], $class);
-        }
         return $file;
     }
 
