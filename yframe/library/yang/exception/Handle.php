@@ -18,7 +18,7 @@ class Handle
 
     public function __construct($exption)
     {
-        if (\yang\App::$app_debug) {
+        if (\yang\Common::$app_debug) {
             $this->data['message'] = $exption->getMessage();
             $this->data['info'] = get_class($exption);
             $this->data['line'] = $exption->getLine();
@@ -57,9 +57,9 @@ class Handle
     public function render()
     {
         header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error');
-        $this->path = \yang\App::path2url(\yang\Env::get('root_path'));
+        $this->path = \yang\Common::path2url(\yang\Env::get('root_path'));
 
-        $this->show = \yang\App::$app_debug;
+        $this->show = \yang\Common::$app_debug;
         fastcgi_finish_request();
         include \yang\Env::get('root_path') . "tpl" . DIRECTORY_SEPARATOR . "exception.php";
         exit();

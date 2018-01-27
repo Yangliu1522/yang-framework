@@ -22,7 +22,7 @@ class Error {
 
     public function __construct()
     {
-        if (App::$app_debug === true) {
+        if (Common::$app_debug === true) {
             // 设置php.ini里的内容 这里是打开错误提示
             ini_set('display_errors', 'On');
             // 设置显示的错误级别 E_ALL 就是全部 E_ALL&~E_WARNING 这样就是显示除了warning的错误

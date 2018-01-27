@@ -20,6 +20,8 @@ $root_dir = dirname(__FILE__) . $ds;
 require $root_dir . 'library/yang/Fastload.php';
 \yang\Fastload::create();
 \yang\Fastload::listen();
+\yang\Fastload::includeFile($root_dir . 'helper.php');
+\yang\Error::register();
 // 开始写配置, 我们要注册array甚至多个
 
 $config = []; // 初始化声明
@@ -37,12 +39,17 @@ $config['runtime_path'] = $config['app_path'] . 'runtime' . $ds;
 $config['cache_path'] = $config['runtime_path'] . 'cache' . $ds;
 $config['log_path'] = $config['runtime_path'] . 'log' . $ds;
 $config['tpl_cache_path'] = $config['runtime_path'] . 'template' . $ds;
+
+\yang\Container::register([
+    'App' => \yang\App::class,
+]);
 // 批量注册系统常量
 \yang\Env::setArray($config);
 // 公共设置
-$config = include 'common/config/config.php';
+$config = \yang\Fastload::getContentOfFile($root_dir . 'common/config/config.php');
 \yang\Env::setArray($config);
 // 这里是应用开始
-\yang\Error::register();
 \yang\Loader::deep();
-\yang\App::create();
+// 容器测试
+\yang\Container::get('App')->create();
+// (new \yang\App)->create();

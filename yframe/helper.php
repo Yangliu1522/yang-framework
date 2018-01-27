@@ -146,6 +146,6 @@ if (!function_exists('http_response_code')) {
 
 if (!function_exists('dump')) {
     function dump() {
-        call_user_func_array('\yang\App::dump', func_get_args());
+        call_user_func_array('\yang\Common::dump', func_get_args());
     }
 }

@@ -11,5 +11,5 @@ require 'yframe/start.php';
 Env::set('app_path', dirname(__FILE__) . '/applications/');
 
 // 开始执行
-App::listen();
+\yang\Container::get('App')->listen();
 

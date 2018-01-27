@@ -8,7 +8,6 @@
 
 namespace yang;
 
-
 class Fastload
 {
 

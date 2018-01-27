@@ -7,21 +7,29 @@
 
 namespace yang;
 
+
+use ReflectionClass, ReflectionFunction;
 /*
  * 入口控制
  */
-class App
+class App implements \ArrayAccess
 {
     // 调用App的内置公共函数
     public static $instrace;
 
     private static $request, $route;
-    public static $app_debug = true;
+
+    public $container;
+
+    public function __construct($app = null, $name = '')
+    {
+        $this->container = Container::getInstance();
+    }
 
     /**
      * 创建基础结构
      */
-    public static function create(Request $request = null)
+    public function create(Request $request = null)
     {
         // self::$app_debug = Env::get('app_debug');
         Fastload::includeFile(Env::get('root_path') . 'helper.php');
@@ -37,18 +45,13 @@ class App
     /**
      * 创建基础目录结构
      */
-    private static function createBase() {
+    private function createBase() {
     }
 
-    public static function path2url($path) {
-        $root2 = str_replace(DIRECTORY_SEPARATOR, '/', $path);
-        $base2 = str_replace(DIRECTORY_SEPARATOR, '/', $_SERVER['DOCUMENT_ROOT']);
-        return str_replace($base2, '', $root2);
-    }
     /**
      * 监听应用
      */
-    public static function listen()
+    public function listen()
     {
         Fastload::includeFile(Env::get('app_path') . 'helper.php');
         Fastload::add(Env::get('app_name') . "\\", Env::get('app_path'));
@@ -57,7 +60,7 @@ class App
         // 请求完毕
         // App::dump($data);
         self::send($data);
-        if (self::$app_debug) {
+        if (Common::$app_debug) {
             Debug::create('end', 'run end');
         }
     }
@@ -74,16 +77,45 @@ class App
         }
     }
 
-    /**
-     * @param mixed
-     */
-    public static function dump()
+
+
+    public function __set($name, $value)
     {
-        $str = func_get_args();
-        foreach ($str as $arrrorstring) {
-            // $arrrorstring = htmlspecialchars($arrrorstring);
-            $pre = print_r($arrrorstring, true);
-            echo '<p><pre>' . $pre . '</pre></p>' . PHP_EOL;
-        }
+        $this->container->bind($name, $value);
+    }
+
+    public function __get($name)
+    {
+        return $this->container->make($name);
+    }
+
+    public function __isset($name)
+    {
+        return $this->container->bound($name);
+    }
+
+    public function __unset($name)
+    {
+        $this->container->__unset($name);
+    }
+
+    public function offsetExists($key)
+    {
+        return $this->__isset($key);
+    }
+
+    public function offsetGet($key)
+    {
+        return $this->__get($key);
+    }
+
+    public function offsetSet($key, $value)
+    {
+        $this->__set($key, $value);
+    }
+
+    public function offsetUnset($key)
+    {
+        $this->__unset($key);
     }
 }
