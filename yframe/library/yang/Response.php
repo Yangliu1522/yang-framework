@@ -31,7 +31,7 @@ class Response {
     }
 
     public function send() {
-        http_response_code($this->code);
+        Common::http_response_code($this->code);
         if (!empty($this->headers)) {
             foreach ($this->headers as $key => $val) {
                 header($key . ":" . $val);
@@ -39,7 +39,7 @@ class Response {
         }
         echo $this->content;
         ob_flush();
-        fastcgi_finish_request();
+        Common::fastcgi_finish_request();
     }
 
     private function convert($content) {

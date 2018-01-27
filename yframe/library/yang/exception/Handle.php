@@ -56,12 +56,12 @@ class Handle
 
     public function render()
     {
-        header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error');
-        $this->path = \yang\Common::path2url(\yang\Env::get('root_path'));
+        \yang\Common::http_response_code(500);
+        $this->path = \yang\Common::path2url(Env::get('root_path'));
 
         $this->show = \yang\Common::$app_debug;
-        fastcgi_finish_request();
-        include \yang\Env::get('root_path') . "tpl" . DIRECTORY_SEPARATOR . "exception.php";
+        \yang\Common::fastcgi_finish_request();
+        include Env::get('root_path') . "tpl" . DIRECTORY_SEPARATOR . "exception.php";
         exit();
     }
 
