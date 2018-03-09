@@ -9,19 +9,25 @@
 namespace yang;
 
 
-class Controller {
+abstract class Controller {
+    /**
+     * @var \yang\Request
+     */
     protected $request;
 
     public function __construct()
     {
-        $this->request = Request::create();
+        $this->request = Container::get('request');
+        $this->init();
     }
 
-    public function display($name, $assign = []) {
+    protected function init() {}
+
+    public function display($name = '', $assign = []) {
         return View::fetch($name, $assign);
     }
 
-    public function assign($name, $value) {
+    public function assign($name, $value = '') {
         View::assign($name, $value);
     }
 

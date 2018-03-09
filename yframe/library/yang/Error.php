@@ -7,7 +7,6 @@
 
 namespace yang;
 
-
 use yang\exception\Handle;
 
 class Error {
@@ -26,19 +25,23 @@ class Error {
             // 设置php.ini里的内容 这里是打开错误提示
             ini_set('display_errors', 'On');
             // 设置显示的错误级别 E_ALL 就是全部 E_ALL&~E_WARNING 这样就是显示除了warning的错误
-            error_reporting(E_ALL);// 忘了打开
+            error_reporting(E_ALL&~E_NOTICE);// 忘了打开
         } else {
             ini_set('display_errors', 'Off');
         }
         // 设置出现异常事调用的函数
         set_exception_handler([$this, 'exception']);
         // 设置出现错误时调用的函数
-        set_error_handler([$this, 'error']);
+        set_error_handler([$this, 'error'], ~E_NOTICE);
         // 设置程序结束后执行的错误
         register_shutdown_function([$this, 'shutdown']);
     }
 
     public function exception($e) {
+        if (Common::$app_debug === false) {
+            Log::recore('exception',  get_class($e) . '   ' . $e->getMessage(), 'error');
+        }
+        Log::recore('exception',  get_class($e) . '   ' . $e->getMessage() . "\n" . $e->getTraceAsString(), 'error');
         $this->output($e); // 这里显示 所有的异常都最终指向这个方法
         //die;
     }
@@ -61,10 +64,10 @@ class Error {
     public function shutdown() {
 
         if (!is_null($error = error_get_last()) && $this->isFatal($error['type'])) {
-            $exception = new ErrorException($error['message'], $error['type'], $error['file'], $error['line']);
+            $exception = new exception\FatalException($error['message'], $error['type'], $error['file'], $error['line']);
             $this->exception($exception);
         }
-        echo $error;
+        // print_r($error);
         Log::save();
     }
 

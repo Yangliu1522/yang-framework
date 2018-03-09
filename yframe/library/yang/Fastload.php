@@ -179,6 +179,7 @@ class Fastload
      */
     public static function includeFile($file, $assign = [])
     {
+        global $_W;
         if (!empty($assign)) {
             extract($assign);
         }

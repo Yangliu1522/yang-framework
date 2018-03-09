@@ -57,17 +57,19 @@ class Request
     /**
      * 获取pathinfo
      * @return mixed
+     * @throws
      */
     public function pathinfo()
     {
         if (!empty($this->pathinfo)) {
             return $this->pathinfo;
         }
-        if (!empty($this->server['PATH_INFO'])) {
+
+        if (!empty($this->server['PATH_INFO']) && Config::get('url_type') == 'pathinfo') {
             $this->pathinfo = trim($_SERVER['PATH_INFO'], '/');
         } else {
             if (Config::get('url_parse.query')) {
-                $this->pathinfo = $_GET[Config::get('url_parse.query')];
+                $this->pathinfo = $this->get(Config::get('url_parse.query'));
             } elseif (!empty($this->server['QUERY_STRING'])) {
                 $this->pathinfo = $this->server['QUERY_STRING'];
             }
@@ -162,7 +164,7 @@ class Request
      * @return array|mixed|string
      * @throws ErrorException
      */
-    public function post($name, $value = '', $default = 's', $callback = '') {
+    public function post($name, $value = '', $default = '', $callback = '') {
 
         if (empty($this->post)) {
             parse_str($this->input, $post);
@@ -184,13 +186,13 @@ class Request
      * @return array|mixed|string
      * @throws ErrorException
      */
-    public function get($name, $value = '', $default = 's', $callback = '') {
+    public function get($name, $value = '', $default = "", $callback = '') {
         if (empty($this->get)) {
             $this->get = $_GET;
         }
 
         if (empty($value)) {
-            return $this->filter($this->get, $name, null, $callback);
+            return $this->filter($this->get, $name, $default, $callback);
         }
         $this->get[$name] = $value;
     }
@@ -547,10 +549,10 @@ class Request
      * @param string $url
      * @param array $args
      */
-    public function route($url = '', $args = [])
-    {
-        return Route::Instrace()->search($url, $args);
-    }
+//    public function route($url = '', $args = [])
+//    {
+//        return Route::Instrace()->search($url, $args);
+//    }
 
     /**
      * 读取设置和删除session
@@ -578,5 +580,24 @@ class Request
         }
 
         return Session::instrace()->all();
+    }
+
+    public function csrf_token($token = '') {
+        if (!empty($token)) {
+            return strcmp($token, $this->session('yf_csrf_token')) === 0;
+        }
+
+        $code = time();
+        $rand = array ( 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z');
+        shuffle($rand);
+        $temp = array_rand($rand, 6);
+
+        foreach ($temp as &$v) {
+            $v = $rand[$v];
+        }
+        $code =  md5($code . $temp);
+
+        $this->session('yf_csrf_token', $code);
+        return $code;
     }
 }

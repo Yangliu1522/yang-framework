@@ -9,34 +9,58 @@
 namespace yang;
 
 
+use yang\exception\FileNotFoundException;
+
 class Template extends template\SimInterface {
     use template\SimFlag;
-    private $file_list = [], $cache_file = '', $content, $cache_content;
+    private $file_list = [], $cache_file = '', $content, $cache_content, $loadTag = [];
     private static $cache_static;
+    private $userclass = '';
     /*
      *  键值为文件绝对路径, 值为输出的缓存文件路径, 做区别处理
      */
     private $update_file_list = [];
     private $tpl_path, $tpl_cache;
 
+    /**
+     * @param $file
+     * @param $tpl_path
+     * @return Template
+     * @throws FileNotFoundException
+     */
     public static function load($file, $tpl_path)
     {
         self::$cache_static = new self($file, $tpl_path);
         return self::$cache_static;
     }
 
+    /**
+     * Template constructor.
+     * @param $file
+     * @param $tpl_path
+     * @throws FileNotFoundException
+     */
     public function __construct($file, $tpl_path)
     {
         $this->file_list[] = $file;
         $this->tpl_path = $tpl_path;
         $this->tpl_cache = Env::get('tpl_cache_path');
         $this->cache_file = $this->tpl_cache . md5($file) . '.php';
-
+        if (!file_exists($file)) {
+            throw new FileNotFoundException($file);
+        }
         $content = $this->parseCache($file, $this->cache_file);
         $this->includeCommand($content);
         if (!empty($this->update_file_list)) {
-            foreach ($this->update_file_list as $tfile => $cfile ) {
+            while (true) {
+                if (empty($this->update_file_list)) {
+                    break;
+                }
+                $f = array_keys($this->update_file_list);
+                $tfile = array_shift($f);
+                $cfile = array_shift($this->update_file_list);
                 $this->parseCache($tfile, $cfile);
+                $this->includeCommand($content);
             }
         }
 
@@ -66,11 +90,14 @@ class Template extends template\SimInterface {
      */
     private function convertContent(&$content) {
         $content = $this->includeCommand($content);
+        $content = $this->loadtagCommand($content);
         $content = $this->showVar($content);
         $content = $this->foreachCommand($content);
         $content = $this->setCommand($content);
         $content = $this->ifCommand($content);
-        $content = $this->fallCallback($content);
+        $content = $this->envCommand($content);
+        $content = $this->configCommand($content);
+        $content = $this->showFunc($content);
     }
 
     public function includeCommand($content = '')
@@ -91,8 +118,8 @@ class Template extends template\SimInterface {
                 $this->cahce_all[md5($mathc[0])] = $contents;
                 return $contents;
             } else {
-                $this->cahce_all[md5($mathc[0])] = '<?php include \'' . $this->convertFile($file) . '\'; ?>' . PHP_EOL;
-                return $this->cache_all;
+                $this->cahce_all[md5($mathc[0])] = $contents = '<?php include \'' . $this->convertFile($file) . '\'; ?>' . PHP_EOL;
+                return $contents;
             }
         }, $content);
     }
@@ -104,6 +131,9 @@ class Template extends template\SimInterface {
 
     private function convertFile($file)
     {
+        if (is_array($file)) {
+            $file = current($file);
+        }
         $file = str_replace(PHP_EOL, '', $file);
         $f = trim($file);
         $tpl = $this->tpl_path . $f . '.html';

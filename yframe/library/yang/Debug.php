@@ -14,20 +14,24 @@ class Debug
     static private $createTo;
     public static function create($name, $value) {
         if (empty(self::$createTo)) {
-            self::$createTo = new static($name, $value);
+            self::$createTo = new static();
         }
+        self::$createTo->runner();
         Log::recore($name, $value, 'debug');
     }
 
-    public function __construct($name, $value)
+    public function __construct()
     {
+        return $this;
+    }
+
+    private function runner() {
         Log::recore('Url', $this->getNowUrl(), 'debug');
         Log::recore('UseMemory', $this->getUseMem() . ' kb', 'debug');
         Log::recore('UseTime', $this->getUseTime() . ' s', 'debug');
         Log::recore('IncludeCount', $this->getIncludeFileNum(), 'debug');
         Log::recore('Requests', $this->getThroughputRate() . ' req/s', 'debug');
     }
-
     /**
      * 当前URL
      * @return mixed

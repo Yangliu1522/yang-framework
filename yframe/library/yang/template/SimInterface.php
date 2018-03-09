@@ -15,9 +15,15 @@ abstract class SimInterface
 
     protected function parseVar($var, $use = false) {
         $var = trim($var);
+        $end = '';
+        if (strpos($var, '|')) {
+            $end = explode('|', $var, 2);
+            $var = $end[0];
+            $end = '|' . end($end);
+        }
 
         if (strpos($var, '.') !== false) {
-            $var = preg_replace_callback('/[a-zA-Z_](?>\w*)(?:[:\.][0-9a-zA-Z_](?>\w*))+/i', function ($m) {
+            $var = preg_replace_callback('/[a-zA-Z_](?>\w*)(?:[\.][0-9a-zA-Z_](?>\w*))+/i', function ($m) {
                 if (isset($this->cahce[$m[0]])) {
                     return $this->cahce[$m[0]];
                 }
@@ -46,7 +52,7 @@ abstract class SimInterface
                 $var = '$' . $var;
             }
         }
-        return $var;
+        return $var . $end;
     }
 
     protected function parseFunc($var) {
@@ -61,13 +67,16 @@ abstract class SimInterface
         if (!empty($functions)) {
             $functions = $functions[0];
             if (strrpos($functions, '|') === false) {
-                $var = "$functions( {$var} )";
+                if (strpos($functions, '(') === false) {
+                    $var = "$functions( {$var} )";
+                } else {
+                    $var = str_replace(['###'], [$var], $functions);
+                }
             } else {
                 $functions = explode('|', $functions);
                 foreach ($functions as $fun) {
-                    if (strpos($fun, '=')) {
-                        $fun = str_replace(['=', '###'], ['(',$var], $fun);
-                        $var = $fun . ')';
+                    if (strpos($fun, '###')) {
+                        $var = str_replace(['###'], [$var], $fun);
                         continue;
                     }
                     $var = "$fun({$var})";

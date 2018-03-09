@@ -13,6 +13,10 @@ class Common
 {
     public static $app_debug = true;
 
+    public static function updateDebug($debug) {
+        static::$app_debug = $debug;
+    }
+
     public static function path2url($path) {
         $root2 = str_replace(DIRECTORY_SEPARATOR, '/', $path);
         $base2 = str_replace(DIRECTORY_SEPARATOR, '/', $_SERVER['DOCUMENT_ROOT']);
@@ -36,9 +40,7 @@ class Common
     {
         ignore_user_abort(true);            // 客户端关闭程序继续执行
         header('X-Accel-Buffering: no');    // nginx 不缓存输出
-        header('Content-Length: ' . strlen(ob_get_contents()));
         header("Connection: close");
-        header("HTTP/1.1 200 OK");
         ob_end_flush();
         flush();
     }
@@ -173,5 +175,60 @@ class Common
             $code = (isset($GLOBALS['http_response_code']) ? $GLOBALS['http_response_code'] : 200);
         }
         return $code;
+    }
+
+    // 微擎函数
+
+    public static function wurl($url, $extentd = '') {
+        global $_W;
+        $url = explode('.', $url);
+        $query = [
+            'op'=> end($url)
+        ];
+        $params = array_merge($query, array(
+            'm' => strtolower(Env::get("modulename")),
+            'uniacid' => $_W['uniacid'],
+            'c'  => 'site',
+            'a'  => 'entry'
+        ));
+        if (!empty($url)) {
+            $params['do'] = $url[0];
+        }
+        $url = "./index.php?";
+        $queryString = http_build_query($params, '', '&');
+        $url .= $queryString . '&' . $extentd;
+        return $url;
+    }
+
+    // 微擎函数
+
+    public static function murl($murl, $extentd = '', $noredirect = '0') {
+        global $_W;
+        $url = '/app/';
+        $murl = explode('.', $murl);
+        $query = [
+            'op'=> end($murl)
+        ];
+        $params = array_merge($query, array(
+            'm' => strtolower(Env::get("modulename")),
+            'i' => $_W['uniacid'],
+            'c'  => 'entry'
+        ));
+        if (!empty($murl)) {
+            $params['do'] = $murl[0];
+        }
+        $url .= "index.php?";
+        $queryString = http_build_query($params, '', '&');
+        $url .= $queryString. '&' . $extentd;
+        if ($noredirect === '0') {
+            $url .= '&wxref=mp.weixin.qq.com#wechat_redirect';
+        }
+        return $url;
+    }
+
+    public static function sqlerror() {
+        $error = pdo_debug(false);
+        $error = end($error);
+        Log::recore('sql', $error);
     }
 }

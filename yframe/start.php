@@ -29,16 +29,11 @@ $config = []; // 初始化声明
 $config['yf_start_time'] = $start;
 $config['yf_start_mem'] = $startMem;
 $config['root_path']     = $root_dir; // 根路径 就是Yframe这个文件夹所在的位置
-$config['base_path']     = dirname($root_dir);// 根路径的上一级路径
+$config['base_path']     = dirname($root_dir) . $ds;// 根路径的上一级路径
 $config['vender_path']   = $config['base_path'] . $ds . 'vendor' . $ds;
+$config['static']   = \yang\Common::path2url($config['base_path'] ) . 'public/';
+
 // 公共路径
-// 这个代表app所在的,也就是入口的路径
-$config['app_path'] = dirname($_SERVER['SCRIPT_FILENAME']) . $ds;
-$config['control_path'] = $config['app_path'] . 'applications' . $ds;
-$config['runtime_path'] = $config['app_path'] . 'runtime' . $ds;
-$config['cache_path'] = $config['runtime_path'] . 'cache' . $ds;
-$config['log_path'] = $config['runtime_path'] . 'log' . $ds;
-$config['tpl_cache_path'] = $config['runtime_path'] . 'template' . $ds;
 
 \yang\Container::register([
     'app' => \yang\App::class,
@@ -48,6 +43,7 @@ $config['tpl_cache_path'] = $config['runtime_path'] . 'template' . $ds;
     'debug' => \yang\Debug::class,
     'log' => \yang\Log::class,
     'route' => \yang\Route::class,
+    'request' => \yang\Request::class,
 ]);
 
 \yang\Fastload::alise([
@@ -62,9 +58,9 @@ $config['tpl_cache_path'] = $config['runtime_path'] . 'template' . $ds;
 \yang\Env::setArray($config);
 // 公共设置
 $config = \yang\Fastload::getContentOfFile($root_dir . 'common/config/config.php');
-\yang\Env::setArray($config);
+\yang\Env::setArray($config['env']);
 // 这里是应用开始
-\yang\Loader::deep();
+\yang\Config::setAsArray($config['config']);
 // 容器测试
 \yang\Container::get('App')->create();
 // (new \yang\App)->create();

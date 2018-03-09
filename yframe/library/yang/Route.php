@@ -10,7 +10,15 @@ namespace yang;
 
 class Route
 {
-    static private $register = [], $instrace, $request;
+    static private $register = [];
+    /**
+     * @var static
+     */
+    static private $instrace;
+    /**
+     * @var \yang\Request
+     */
+    static private $request;
 
     public function __construct()
     {
@@ -195,7 +203,7 @@ class Route
                     if ($method[0] != 'ANY' && !in_array(self::$request->method(), $method)) {
 
                         Log::recore('HTTP', 'Request method is not really');
-                        if (App::$app_debug) {
+                        if (Common::$app_debug) {
                             throw new ErrorException('请求方式错误');
                         } else {
                             // 此处抛出404;

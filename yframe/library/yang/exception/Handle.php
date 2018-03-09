@@ -45,10 +45,9 @@ class Handle
                 ['name' => "Environment Variables", 'data' => $_ENV],
             ];
         } else {
-            $this->data['message'] = $exption->getMessage();
-            $file = $exption->getFile();
-            $line = $exption->getLine();
-            $this->data['trace_string'] = $this->data['message'] . "\n {$file}({$line}) \n" . $exption->getTraceAsString();
+            $this->data['message'] = "Status: 500 似乎没有发现任何东西";
+            $file = '';$line = 0;
+            $this->data['trace_string'] = "500";
             $this->data['info'] = str_replace(__NAMESPACE__ . '\\', '', get_class($exption));
         }
         return $this;
@@ -56,12 +55,11 @@ class Handle
 
     public function render()
     {
-        \yang\Common::http_response_code(500);
-        $this->path = \yang\Common::path2url(Env::get('root_path'));
-
         $this->show = \yang\Common::$app_debug;
-        \yang\Common::fastcgi_finish_request();
-        include Env::get('root_path') . "tpl" . DIRECTORY_SEPARATOR . "exception.php";
+        ob_start();
+        include \yang\Env::get('root_path') . "tpl" . DIRECTORY_SEPARATOR . "exception.php";
+        $content = ob_get_contents();
+        \yang\Response::create($content, 500)->send();
         exit();
     }
 

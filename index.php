@@ -12,4 +12,3 @@ Env::set('app_path', dirname(__FILE__) . '/applications/');
 
 // 开始执行
 \yang\Container::get('App')->listen();
-

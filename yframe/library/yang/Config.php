@@ -18,18 +18,17 @@ class Config
         if (!is_array($name)) {
             return isset(self::$configs[$name]) ? self::$configs[$name] : null;
         } else {
+
             $parse = [];
             foreach ($name as $val) {
                 if (!isset(self::$configs[$val])) {
-                    return null;
+                    if (!isset($parse[$val])) {
+                        return null;
+                    }
+                    $parse = $parse[$val];
                 } else {
                     $parse = self::$configs[$val];
                 }
-
-                if (!isset($parse[$val])) {
-                    return null;
-                }
-                $parse = $parse[$val];
             }
             return $parse;
         }

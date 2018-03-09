@@ -16,14 +16,26 @@ class App implements \ArrayAccess
 {
     // 调用App的内置公共函数
     public static $instrace;
+    /**
+     * @var \yang\Request
+     */
+    public static $request;
+    public $requests;
 
-    private static $request, $route;
+    /**
+     * @var \yang\Route
+     */
+    private static $route;
 
+    /**
+     * @var \yang\Container
+     */
     public $container;
 
     public function __construct()
     {
         $this->container = Container::getInstance();
+        Common::updateDebug(Env::get('app_debug'));
     }
 
     /**
@@ -31,7 +43,7 @@ class App implements \ArrayAccess
      */
     public function create(Request $request = null)
     {
-        // self::$app_debug = Env::get('app_debug');
+
         Fastload::includeFile(Env::get('root_path') . 'helper.php');
         Log::recore('DATE', date('Y-m-d H:i:s', time()));
         if (empty(self::$instrace)) {
@@ -51,12 +63,23 @@ class App implements \ArrayAccess
     /**
      * 监听应用
      */
-    public function listen()
+    public function listen($routedata = 'index/index/index', $app_path = '')
     {
+        $ds = DIRECTORY_SEPARATOR;
+        $config = [];
+        $config['app_path'] = !empty($app_path) ? $app_path: dirname($_SERVER['SCRIPT_FILENAME']) . $ds;
+        $config['control_path'] = $config['app_path'] . 'applications' . $ds;
+        $config['runtime_path'] = $config['app_path'] . '../runtime' . $ds;
+        $config['cache_path'] = $config['runtime_path'] . 'cache' . $ds;
+        $config['log_path'] = $config['runtime_path'] . 'log' . $ds;
+        $config['tpl_cache_path'] = $config['runtime_path'] . 'template' . $ds;
+
+        Env::setArray($config);
+
         Fastload::includeFile(Env::get('app_path') . 'helper.php');
         Fastload::add(Env::get('app_name') . "\\", Env::get('app_path'));
         ob_start();
-        $data = self::$route->listen('index/index/index');
+        $data = self::$route->listen($routedata);
         // 请求完毕
         // App::dump($data);
         self::send($data);

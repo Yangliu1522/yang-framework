@@ -38,7 +38,6 @@ class Response {
             }
         }
         echo $this->content;
-        ob_flush();
         Common::fastcgi_finish_request();
     }
 
@@ -49,6 +48,7 @@ class Response {
                 if (Env::get('use_json')) {
                     return json_encode($content);
                 }
+                return var_export($content, true);
             case 'object':
                 $content = get_object_vars($content);
                 return json_encode($content);
