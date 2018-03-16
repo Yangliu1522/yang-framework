@@ -182,9 +182,14 @@ class Common
     public static function wurl($url, $extentd = '') {
         global $_W;
         $url = explode('.', $url);
-        $query = [
-            'op'=> end($url)
-        ];
+        if (count($url) > 1) {
+            $query = [
+                'op' => end($url)
+            ];
+        } else {
+            $query = [
+            ];
+        }
         $params = array_merge($query, array(
             'm' => strtolower(Env::get("modulename")),
             'uniacid' => $_W['uniacid'],
@@ -206,9 +211,14 @@ class Common
         global $_W;
         $url = '/app/';
         $murl = explode('.', $murl);
-        $query = [
-            'op'=> end($murl)
-        ];
+        if (count($murl) > 1) {
+            $query = [
+                'op' => end($murl)
+            ];
+        } else {
+            $query = [
+            ];
+        }
         $params = array_merge($query, array(
             'm' => strtolower(Env::get("modulename")),
             'i' => $_W['uniacid'],

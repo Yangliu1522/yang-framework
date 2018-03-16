@@ -8,13 +8,16 @@
 
 namespace yang;
 
+/**
+ * Class Fastload
+ * @package yang
+ */
 class Fastload
 {
 
     private static $prefixAll = [];
     private static $prefixDir = [];
     private static $all = [];
-    private static $Filelist = [];
     private $classmap = [], $missclass = [];
     private static $instrace, $class_alias = [];
 

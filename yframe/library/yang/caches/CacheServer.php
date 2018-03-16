@@ -31,9 +31,4 @@ interface CacheServer
      */
     public function clear($name = '');
 
-    /**
-     * 初始化, 重置
-     * @return static
-     */
-    public static function init();
 }

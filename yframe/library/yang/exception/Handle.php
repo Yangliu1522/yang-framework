@@ -16,6 +16,10 @@ class Handle
         'file_content' => '',
     ];
 
+    /**
+     * Handle constructor.
+     * @param \Exception $exption
+     */
     public function __construct($exption)
     {
         if (\yang\Common::$app_debug) {

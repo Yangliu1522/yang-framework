@@ -27,6 +27,7 @@ abstract class SimInterface
                 if (isset($this->cahce[$m[0]])) {
                     return $this->cahce[$m[0]];
                 }
+
                 if (strpos($m[0], '.') === false) {
                     return '$' . $m[0];
                 }
@@ -48,7 +49,7 @@ abstract class SimInterface
                 return $this->cahce[$m[0]];
             }, $var);
         } else {
-            if ($use === false) {
+            if ($use === false && !is_numeric($var) && strpos($var, '$') === false) {
                 $var = '$' . $var;
             }
         }
@@ -94,7 +95,7 @@ abstract class SimInterface
     }
 
     protected function parseConditionVar($condition) {
-        return preg_replace_callback('/(?![\$\'">])[a-zA-Z0-9_](?>\w*)+(?![\("\'\=\+\-\#\%\/\[\{|,\?])/is', function ($match) {
+        return preg_replace_callback('/(?![\'\$">])[a-zA-Z_](?>\w*)+(?![\("\'\=\+\-\#\%\/\[\{\|\,\?])/is', function ($match) {
             if (isset($this->cahce[$match[0]])) {
                 return $this->cahce[$match[0]];
             }

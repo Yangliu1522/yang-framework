@@ -16,6 +16,8 @@ return [
         'action_name' => 'index',
         'cache_life'  => 600,
         'use_json'    => true,
+        'db_connection' => 'we7',
+        'db_prifx' => 'yf_appoint_'
     ],
     'config' => [
         'url_type'    => 'query',

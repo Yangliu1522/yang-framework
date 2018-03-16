@@ -9,11 +9,11 @@
 namespace yang\exception;
 
 
-class FatalException extends \Exception
+class FatalException extends \RuntimeException
 {
     public $type;
 
-    public function __construct($message = "", $code = 0, $file = '', $line = 0, \Throwable $previous = null)
+    public function __construct($message = "", $code = 0, $file = '', $line = 0)
     {
         if (empty($file)) {
             $debug = debug_backtrace()[0];
@@ -24,6 +24,6 @@ class FatalException extends \Exception
         $this->file = $file;
         $this->line = $line;
 
-        parent::__construct($message, $code, $previous);
+        parent::__construct($message, $code);
     }
 }

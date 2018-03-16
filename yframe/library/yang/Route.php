@@ -186,7 +186,7 @@ class Route
 
     /**
      * 监听路由
-     * @throws ErrorException
+     * @throws \yang\exception\RouteException
      */
     public function listen($base = '')
     {
@@ -204,7 +204,7 @@ class Route
 
                         Log::recore('HTTP', 'Request method is not really');
                         if (Common::$app_debug) {
-                            throw new ErrorException('请求方式错误');
+                            throw new \yang\exception\RouteException('请求方式错误');
                         } else {
                             // 此处抛出404;
                             die;
@@ -261,7 +261,7 @@ class Route
     /**
      * @param $array
      * @param array $params
-     * @throws ErrorException
+     * @throws \yang\exception\RouteException
      */
     private function parse_params($array, $params = []) {
         $route_params = explode('/', trim($array, '/'));
@@ -273,7 +273,7 @@ class Route
                 } else {
                     if (!isset($reg['shadow'])){
                         Log::recore('ARGV', $key . ' type error or not found');
-                        throw new ErrorException('参数错误');
+                        throw new \yang\exception\RouteException('参数错误');
                     }
                 }
             }

@@ -67,7 +67,11 @@ class App implements \ArrayAccess
     {
         $ds = DIRECTORY_SEPARATOR;
         $config = [];
-        $config['app_path'] = !empty($app_path) ? $app_path: dirname($_SERVER['SCRIPT_FILENAME']) . $ds;
+        if (!empty($app_path)) {
+            $config['app_path'] = !empty($app_path) ? $app_path : dirname($_SERVER['SCRIPT_FILENAME']) . $ds;
+        } else {
+            $config['app_path'] = Env::get('app_path');
+        }
         $config['control_path'] = $config['app_path'] . 'applications' . $ds;
         $config['runtime_path'] = $config['app_path'] . '../runtime' . $ds;
         $config['cache_path'] = $config['runtime_path'] . 'cache' . $ds;
