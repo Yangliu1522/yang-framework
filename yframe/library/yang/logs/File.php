@@ -22,7 +22,7 @@ class File implements LogServe
     /**
      * 返回Log的生成语句
      * @return string
-     * @throws ErrorException
+     * @throws \yang\exception\Premission
      */
     public function save($content = '')
     {
@@ -31,7 +31,7 @@ class File implements LogServe
         $path = \yang\Env::get('log_path') . $path . DIRECTORY_SEPARATOR;
         if (!is_dir($path)) {
             if(!mkdir($path, 0755, true)) {
-                throw new \ErrorException('Permission denied');
+                throw new \yang\exception\Premission($path);
             }
         }
         $file = date('d', $time) . '.log';

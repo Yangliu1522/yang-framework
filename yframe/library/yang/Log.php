@@ -40,10 +40,12 @@ class Log
     }
 
     public static function save() {
-        $str = '----------------------------------------' . PHP_EOL;
-        $str = implode('', self::$logs) . $str . PHP_EOL;
-        self::create()->save($str);
-        self::$logs = [];
+        if (!empty(self::$logs)) {
+            $str = '----------------------------------------' . PHP_EOL;
+            $str = implode('', self::$logs) . $str . PHP_EOL;
+            self::create()->save($str);
+            self::$logs = [];
+        }
     }
 
     public static function write($name, $value = '', $type = 'info') {

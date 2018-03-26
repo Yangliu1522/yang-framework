@@ -45,7 +45,6 @@ class App implements \ArrayAccess
     {
 
         Fastload::includeFile(Env::get('root_path') . 'helper.php');
-        Log::recore('DATE', date('Y-m-d H:i:s', time()));
         if (empty(self::$instrace)) {
             self::$instrace = new static();
         }
@@ -81,6 +80,7 @@ class App implements \ArrayAccess
         // App::dump($data);
         self::send($data);
         if (Common::$app_debug) {
+            Log::recore('DATE', date('Y-m-d H:i:s', time()));
             Debug::create('end', 'run end');
         }
     }

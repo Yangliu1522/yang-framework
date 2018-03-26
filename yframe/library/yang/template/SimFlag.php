@@ -10,9 +10,6 @@ namespace yang\template;
 
 // 指令实现
 
-use function GuzzleHttp\Psr7\str;
-use yang\Log;
-
 trait SimFlag
 {
     use SimParse;
