@@ -38,9 +38,9 @@ class Error {
     }
 
     public function exception($e) {
-        if (Common::$app_debug === false) {
-            Log::recore('exception',  get_class($e) . '   ' . $e->getMessage(), 'error');
-        }
+//        if (Common::$app_debug === false) {
+//            Log::recore('exception',  get_class($e) . '   ' . $e->getMessage(), 'error');
+//        }
         Log::recore('exception',  get_class($e) . '   ' . $e->getMessage() . "\n" . $e->getTraceAsString(), 'error');
         $this->output($e); // 这里显示 所有的异常都最终指向这个方法
         //die;
@@ -68,7 +68,12 @@ class Error {
             $this->exception($exception);
         }
         // print_r($error);
-        Log::save();
+        try {
+            Log::save();
+        } catch (\Exception $e) {
+            $this->exception($e);
+            die;
+        }
     }
 
     private function isFatal($type)

@@ -32,6 +32,11 @@ $config['root_path']     = $root_dir; // 根路径 就是Yframe这个文件夹�
 $config['base_path']     = dirname($root_dir) . $ds;// 根路径的上一级路径
 $config['vender_path']   = $config['base_path'] . $ds . 'vendor' . $ds;
 $config['static']   = \yang\Common::path2url($config['base_path'] ) . 'public/';
+$config['runtime_path'] = $config['base_path'] . 'runtime' . $ds;
+$config['cache_path'] = $config['runtime_path'] . 'cache' . $ds;
+$config['log_path'] = $config['runtime_path'] . 'log' . $ds;
+$config['tpl_cache_path'] = $config['runtime_path'] . 'template' . $ds;
+
 
 // 公共路径
 

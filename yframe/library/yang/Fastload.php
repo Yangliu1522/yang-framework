@@ -104,6 +104,10 @@ class Fastload
      */
     public function load($class)
     {
+
+        if (class_exists($class, false)) {
+            return true;
+        }
         // 转换类名为大写, 规范
         if (preg_match('/\\\([a-z0-9]+)$/', $class)) {
             $class = preg_replace_callback('/\\\([a-z0-9]+)$/', function ($match) {

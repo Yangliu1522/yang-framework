@@ -61,24 +61,17 @@ class App implements \ArrayAccess
     }
 
     /**
+     * @return Request
+     */
+    public function request() {
+        return self::$request;
+    }
+
+    /**
      * 监听应用
      */
-    public function listen($routedata = 'index/index/index', $app_path = '')
+    public function listen($routedata = 'index/index/index')
     {
-        $ds = DIRECTORY_SEPARATOR;
-        $config = [];
-        if (!empty($app_path)) {
-            $config['app_path'] = !empty($app_path) ? $app_path : dirname($_SERVER['SCRIPT_FILENAME']) . $ds;
-        } else {
-            $config['app_path'] = Env::get('app_path');
-        }
-        $config['control_path'] = $config['app_path'] . 'applications' . $ds;
-        $config['runtime_path'] = $config['app_path'] . '../runtime' . $ds;
-        $config['cache_path'] = $config['runtime_path'] . 'cache' . $ds;
-        $config['log_path'] = $config['runtime_path'] . 'log' . $ds;
-        $config['tpl_cache_path'] = $config['runtime_path'] . 'template' . $ds;
-
-        Env::setArray($config);
 
         Fastload::includeFile(Env::get('app_path') . 'helper.php');
         Fastload::add(Env::get('app_name') . "\\", Env::get('app_path'));

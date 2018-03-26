@@ -34,6 +34,7 @@ class Log
         $type = strtoupper($type);
         $value = self::convertArray($value);
         $name = strtoupper($name);
+
         $str = "[{$type}][{$name}] {$value}". PHP_EOL;
         self::$logs[] = $str;
     }
@@ -51,8 +52,8 @@ class Log
     }
 
     public static function convertArray($value) {
-        if (is_array($value)) {
-            return json_encode($value);
+        if (is_array($value) || $value instanceof \yang\model\Result) {
+            return json_encode($value, JSON_PRETTY_PRINT);
         }
         return $value;
     }

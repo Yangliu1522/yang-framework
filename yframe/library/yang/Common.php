@@ -181,7 +181,7 @@ class Common
 
     public static function wurl($url, $extentd = '') {
         global $_W;
-        $url = explode('.', $url);
+        $url = explode('.', $url, 2);
         if (count($url) > 1) {
             $query = [
                 'op' => end($url)
@@ -207,10 +207,10 @@ class Common
 
     // 微擎函数
 
-    public static function murl($murl, $extentd = '', $noredirect = '0') {
+    public static function murl($murl, $extentd = '', $noredirect = false) {
         global $_W;
         $url = '/app/';
-        $murl = explode('.', $murl);
+        $murl = explode('.', $murl, 2);
         if (count($murl) > 1) {
             $query = [
                 'op' => end($murl)
@@ -230,7 +230,7 @@ class Common
         $url .= "index.php?";
         $queryString = http_build_query($params, '', '&');
         $url .= $queryString. '&' . $extentd;
-        if ($noredirect === '0') {
+        if ($noredirect === false) {
             $url .= '&wxref=mp.weixin.qq.com#wechat_redirect';
         }
         return $url;
@@ -240,5 +240,15 @@ class Common
         $error = pdo_debug(false);
         $error = end($error);
         Log::recore('sql', $error);
+    }
+
+    public static function humpToDot($str){
+        $str = lcfirst($str);
+        if (preg_match('/([A-Z]{1})/',$str)){
+            $str = preg_replace_callback('/([A-Z]{1})/',function($matches){
+                return '.'.strtolower($matches[0]);
+            },$str);
+        }
+        return $str;
     }
 }

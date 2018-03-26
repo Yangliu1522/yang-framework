@@ -153,7 +153,7 @@ class Request
         }
 
         $name = strtoupper($name);
-        return $this->filter($this->server, $name, $default, '',  $callback);
+        return $this->filter($this->server, $name, $default, $callback);
     }
 
     /**
@@ -167,10 +167,12 @@ class Request
     public function post($name, $value = '', $default = '', $callback = '') {
 
         if (empty($this->post)) {
+            if (empty($this->input)) {
+                $this->input = file_get_contents('php://input');
+            }
             parse_str($this->input, $post);
             $this->post = $post;
         }
-
         if (empty($value)) {
             return $this->filter($this->post, $name, $default, $callback);
         }
@@ -213,7 +215,7 @@ class Request
             } elseif (isset($this->server['HTTP_X_HTTP_METHOD_OVERRIDE'])) {
                 $this->method = strtoupper($this->server['HTTP_X_HTTP_METHOD_OVERRIDE']);
             } else {
-                $this->method = isset($this->server['REQUEST_METHOD']) ? $this->server['REQUEST_METHOD'] : $this->server['REQUEST_METHOD'];
+                $this->method = isset($this->server['REQUEST_METHOD']) ? $this->server['REQUEST_METHOD'] : $_SERVER['REQUEST_METHOD'];
             }
         }
         return $this->method;
@@ -480,7 +482,7 @@ class Request
      */
     public function isSsl()
     {
-        $server = array_merge($_SERVER, $this->server);
+        $server = $_SERVER;
         if (isset($server['HTTPS']) && ('1' == $server['HTTPS'] || 'on' == strtolower($server['HTTPS']))) {
             return true;
         } elseif (isset($server['REQUEST_SCHEME']) && 'https' == $server['REQUEST_SCHEME']) {
@@ -490,6 +492,8 @@ class Request
         } elseif (isset($server['HTTP_X_FORWARDED_PROTO']) && 'https' == $server['HTTP_X_FORWARDED_PROTO']) {
             return true;
         } elseif (Config::get('https_agent_name') && isset($server[Config::get('https_agent_name')])) {
+            return true;
+        } elseif (Config::get('needssl')) {
             return true;
         }
         return false;

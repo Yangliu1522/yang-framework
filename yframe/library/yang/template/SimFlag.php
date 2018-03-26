@@ -42,7 +42,7 @@ trait SimFlag
             $match[2] = $this->parseVar($match[2]);
             // 转换变量
             //end
-            $return = '<?php if(is_array(' . $match[2] . ')): $__LIST__ = ' . $match[2] . ';foreach ($__LIST__ as ' . $match[1] . '): ?>';
+            $return = '<?php if(is_array(' . $match[2] . ') || ' .$match[2]. ' instanceof \yang\model\Result): $__LIST__ = ' . $match[2] . ';foreach ($__LIST__ as ' . $match[1] . '): ?>';
             $this->cahce_all[md5($match[0])] = $return;
             return $return;
         }, $content);
@@ -86,18 +86,13 @@ trait SimFlag
      */
     public function setCommand($content = '')
     {
-        return preg_replace_callback('/@var(?:[\s]*)([\w\W]*?);/i', function ($match) {
+        return preg_replace_callback('/@var\(([\w\W]*?),([\w\W]*?)\);/i', function ($match) {
             if (isset($this->cahce_all[md5($match[0])])) {
                 return $this->cahce_all[md5($match[0])];
             }
             $condition = '""';
-            if (strpos($match[1], '=')) {
-                $var = explode('=', $match[1]);
-                $condition = end($var);
-                $var = $this->parseVar($var[0]);
-            } else {
-                $var = $this->parseVar($match[1]);
-            }
+            $var = $this->parseVar($match[1]);
+            $condition = $match[2];
 
             $return = '<?php ' . $var . ' = ' . $condition . '; ?>';
             $this->cahce_all[md5($match[0])] = $return;
@@ -170,6 +165,11 @@ trait SimFlag
             $req = \yang\Request::create();
             $module = $req->module();
             $name = trim($match[1]);
+            if (strpos($name, '/')) {
+                $name = explode('/', $name,2);
+                $module = $name[0];
+                $name = str_replace('/', '\\', end($name));
+            }
             $class = '\\app\\' . $module . '\\taglib\\' . ucfirst($name);
 
             $this->loadTag[ucfirst($name)] = $class;

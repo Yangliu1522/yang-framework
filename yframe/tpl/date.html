@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>500 服务器出现了错误</title>
+</head>
+<body>
+
+<style>
+    body, html {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    .main {
+        width: 100%;
+        height: 100%;
+        display: flex;
+    }
+
+    .left_nav {
+        width: 30%;
+        height: 100%;
+        border-right: 1px solid #9e9d9f;
+        background: #f5efef;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+
+    .info_head {
+        width: 100%;
+        height: 150px;
+        background: #ece6e7;
+        overflow: hidden;
+    }
+
+    .info_phead {
+        margin: 0;
+        width: 100%;
+        padding: 5% 4%;
+    }
+
+    .info_phead .title {
+        color: #000000;
+        font-weight: bold;
+        font-size: 16px;
+        word-spacing: 2px;
+        overflow: hidden;
+    }
+
+    .info_phead .title span {
+        font-size: 20px;
+        color: #ff0600;
+    }
+
+    .info_phead .info {
+        width: 90%;
+        font-size: 22px;
+        line-height: 20px;
+        word-break:break-all;
+    }
+
+    .trace_list {
+        margin-bottom: 100px;
+    }
+
+    .trace_list .list_div {
+        margin: 10px auto;
+        width: 98%;
+        height: 100px;
+        background: #ffffff;
+        border-right: 6px solid #ffffff;
+    }
+
+    .list_div .error_info {
+        padding-left: 20px;
+        padding-top: 15px;
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    .trace_list .active {
+        border-right: 6px solid #e64ec4;
+    }
+
+    .list_div .error_file {
+        padding-top: 3px;
+        padding-left: 20px;
+        width: 89%;
+        font-size: 16px;
+        color: #7b7b7b;
+        word-break: break-all;
+    }
+
+    .right_nav {
+        width: 70%;
+        height: 100%;
+        margin: 0 20px;
+        margin-left: 0;
+    }
+
+</style>
+<div class="main">
+
+    <div class="left_nav">
+
+        <div class="info_head">
+            <div class="info_phead">
+                <div class="title">namespace\namespace\<span>Exception</span></div>
+                <div class="info">
+                    msgmsgmsgmsgmsgmsgmsgmsgmsgmsgmsgmsgmsgmsgmsgmsgmsgmsg
+                    msgmsgmsgmsgmsg
+                    msgmsgmsg
+                    msgmsgmsg
+                    msgmsg
+                    msg
+                </div>
+            </div>
+        </div>
+
+        <div class="trace_list">
+            <div class="list_div active">
+                <div class="error_info">namesapce/Exception</div>
+                <div class="error_file">Filename(Line)</div>
+            </div>
+            <div class="list_div">
+                <div class="error_info">namesapce/Exception</div>
+                <div class="error_file">Filename(Line)Filename(Line)Filename(Line)Filename(Line)Filename(Line)Filename(Line)</div>
+            </div>
+            <div class="list_div">
+                <div class="error_info">namesapce/Exception</div>
+                <div class="error_file">Filename(Line)</div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="right_nav">
+
+        <div class="trace_code">
+            <div>Filename(line)</div>
+            <div>
+                <pre class="code"></pre>
+            </div>
+        </div>
+
+        <div class="info_data">
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

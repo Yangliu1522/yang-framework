@@ -12,7 +12,7 @@ namespace yang;
 class Response {
     private static $inter;
     private $content = '',
-    $code = 200,
+    $code = 200,$is_json = false,
     $headers = [],
     $options = [];
     public static function create($content, $code = '200', $headers = [], $options = []) {
@@ -37,8 +37,25 @@ class Response {
                 header($key . ":" . $val);
             }
         }
+
         echo $this->content;
         Common::fastcgi_finish_request();
+    }
+
+    public function headers(array $header = array()){
+        $this->header = array_merge($this->headers,$header);
+        return $this;
+    }
+
+    public function contentType($type,$charset = ''){
+        if ($this->is_json){
+            $type = 'text/json';
+        }
+        $this->headers['Content-Type'] = $type;
+        if (!empty($charset)) {
+            $this->headers['Content-Type'] .= '; charset=' . $charset;
+        }
+        return $this;
     }
 
     private function convert($content) {
@@ -46,6 +63,7 @@ class Response {
         switch ($this->gettype($content)) {
             case 'array':
                 if (Env::get('use_json')) {
+                    $this->contentType('text/json');
                     return json_encode($content);
                 }
                 return var_export($content, true);

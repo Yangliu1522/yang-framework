@@ -69,7 +69,7 @@ class View
         if (Env::get('tpl_path') == '') {
             $tpl_path = rtrim(Env::get('app_path'), '/') . '/' . $module . "/view/";
         } else {
-            $tpl_path = trim(Env::get('tpl_path')) . rtrim(Env::get('app_path'), '/') . '/';
+            $tpl_path = rtrim(Env::get('tpl_path'), '/') . '/' . $module . '/';
         }
 
         if (strpos($name, '/') === false) {

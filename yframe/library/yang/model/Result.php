@@ -9,7 +9,7 @@
 namespace yang\model;
 
 
-class Result implements \ArrayAccess, \Iterator
+class Result implements \ArrayAccess, \Iterator, \JsonSerializable
 {
     private $data = [];
     protected $more = false;
@@ -83,6 +83,10 @@ class Result implements \ArrayAccess, \Iterator
     }
 
     public function toArray() {
+        return $this->data;
+    }
+
+    public function jsonSerialize() {
         return $this->data;
     }
 }

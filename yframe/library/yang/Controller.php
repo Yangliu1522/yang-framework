@@ -8,7 +8,10 @@
 
 namespace yang;
 
-
+/**
+ * Class Controller
+ * @package yang
+ */
 abstract class Controller {
     /**
      * @var \yang\Request
@@ -17,7 +20,7 @@ abstract class Controller {
 
     public function __construct()
     {
-        $this->request = Container::get('request');
+        $this->request = App::$request;
         $this->init();
     }
 
