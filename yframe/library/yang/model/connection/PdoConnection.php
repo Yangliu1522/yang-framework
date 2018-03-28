@@ -48,7 +48,7 @@ class PdoConnection extends Connection
         $error = 'success';
         if ($pre === false) {
             $error = $this->pdo->errorInfo();$error = $error[2];
-            if (\yf\Config::get('app_debug')) throw new \PDOException($error);
+            if (\yang\Common::$app_debug) throw new \PDOException($error);
         }
         $this->insertId = $this->pdo->lastInsertId();
         $data2 = $pre->execute($data);
@@ -66,7 +66,7 @@ class PdoConnection extends Connection
         $error = 'success';
         if ($pre === false) {
             $error = $this->pdo->errorInfo();$error = $error[2];
-            if (\yf\Config::get('app_debug')) throw new \PDOException($error);
+            if (\yang\Common::$app_debug) throw new \PDOException($error);
         }
         $pre->execute($data);
         $this->convertSql($statement, $data, $error);
@@ -82,7 +82,7 @@ class PdoConnection extends Connection
         $error = 'success';
         if ($sth === false) {
             $error = $this->pdo->errorInfo();$error = $error[2];
-            if (\yf\Config::get('app_debug')) throw new \PDOException($error);
+            if (\yang\Common::$app_debug) throw new \PDOException($error);
         }
         $sth->execute($data);
         $this->convertSql($statement, $data, $error);
@@ -98,7 +98,7 @@ class PdoConnection extends Connection
         $error = 'success';
         if ($pre === false) {
             $error = $this->pdo->errorInfo();$error = $error[2];
-            if (\yf\Config::get('app_debug')) throw new \PDOException($error);
+            if (\yang\Common::$app_debug) throw new \PDOException($error);
         }
         $pre->execute($data);
         $this->convertSql($statement, $data, $error);

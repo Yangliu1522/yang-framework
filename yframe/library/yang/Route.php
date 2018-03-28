@@ -8,6 +8,8 @@
 
 namespace yang;
 
+use yang\exception\RouteException;
+
 class Route
 {
     static private $register = [];
@@ -22,7 +24,6 @@ class Route
 
     public function __construct()
     {
-        return $this;
     }
 
     /**
@@ -34,11 +35,8 @@ class Route
     public function create(array $route, Request $request)
     {
         self::$request = $request;
-        if (empty(self::$instrace)) {
-            self::$instrace = new static();
-            self::$instrace->register($route);
-        }
-        return self::$instrace;
+        $this->register($route);
+        return $this;
     }
 
     /**
@@ -49,7 +47,7 @@ class Route
     {
 
         foreach ($route as $key => $value) {
-            if (!is_array($value[0])) {
+            if (is_array($value)) {
                 $this->parse_route($key, $value[0], $value[1], $value[2]);
                 continue;
             }
@@ -68,8 +66,7 @@ class Route
     {
         $rend = [];
         $route = explode('/', $route);
-        $route_bak = array_reverse($route);
-
+        $route_bak = $route;
         foreach ($route_bak as $vl) {
             if (strpos($vl, '{') === 0) {
                 $vl = trim($vl, '{}');
@@ -83,7 +80,8 @@ class Route
                 }
 
                 if (!empty($parmes)) {
-                    $rend[$vl]['reg'] = array_pop($parmes);
+                    $rend[$vl]['reg'] = $parmes[$vl];
+                    array_pop($parmes);
                 } else {
                     $rend[$vl]['reg'] = '.*';
                 }
@@ -107,7 +105,7 @@ class Route
                 'method' => $method
             ];
         } else {
-            self::$register[implode('/', $route)] = [
+            self::$register[implode('/', $route)]['__SELF__'] = [
                 'callback' => $callBack,
                 'params' => $rend,
                 'method' => $method
@@ -186,7 +184,7 @@ class Route
 
     /**
      * 监听路由
-     * @throws ErrorException
+     * @throws RouteException
      */
     public function listen($base = '')
     {
@@ -194,30 +192,39 @@ class Route
         if (empty($url)) {
             $url = $base;
         }
-        foreach (self::$register as $key => $value) {
-            if (strpos($url, $key . '/') === 0) {
-                if (isset($value['callback'])) {
-                    // $controller = $value['callback'];
-                    $params = ltrim($url, $key . '/');
-                    $method = $value['method'];
-                    if ($method[0] != 'ANY' && !in_array(self::$request->method(), $method)) {
-
-                        Log::recore('HTTP', 'Request method is not really');
-                        if (Common::$app_debug) {
-                            throw new ErrorException('请求方式错误');
-                        } else {
-                            // 此处抛出404;
-                            die;
-                        }
-                    }
-
-                    $this->parse_params($params, $value['params']);
-                    return $this->run($value['callback']);
-                    break;
+        krsort(self::$register);
+        foreach (self::$register as $base => $child) {
+            $child = array_reverse($child);
+            foreach ($child as $key => $value) {
+                if ($key == '__SELF__') {
+                    $key = $base;
+                } else {
+                    $key = $base . '/' . $key;
                 }
-                foreach ($value as $k2 => $v2) {
-                    if (strpos($url, $key . '/' . $k2 . '/') === 0) {
+                if (strpos($url . '/', $key . '/') === 0) {
+                    if (isset($value['callback'])) {
+                        // $controller = $value['callback'];
+                        $params = ltrim($url, $key . '/');
+                        $method = $value['method'];
+                        if ($method[0] != 'ANY' && !in_array(self::$request->method(), $method)) {
+
+                            Log::recore('HTTP', 'Request method is not really');
+                            if (Common::$app_debug) {
+                                throw new RouteException('请求方式错误');
+                            } else {
+                                // 此处抛出404;
+                                die;
+                            }
+                        }
+
+                        $this->parse_params($params, $value['params']);
+                        return $this->run(explode('/', trim($value['callback'], '/')));
                         break;
+                    }
+                    foreach ($value as $k2 => $v2) {
+                        if (strpos($url, $key . '/' . $k2 . '/') === 0) {
+                            break;
+                        }
                     }
                 }
             }
@@ -261,19 +268,24 @@ class Route
     /**
      * @param $array
      * @param array $params
-     * @throws ErrorException
+     * @throws RouteException
      */
     private function parse_params($array, $params = []) {
-        $route_params = explode('/', trim($array, '/'));
+        if (strpos($array, '/') !== false) {
+            $route_params = explode('/', trim($array, '/'));
+        } else {
+            $route_params = [$array];
+        }
 
         if (!empty($params)) {
             foreach ($params as $key => $reg) {
-                if (preg_match('/' . $reg['reg']. '/', $route_params[0], $match)) {
-                    self::$request->get($key, array_shift($route_params));
+                $check = array_shift($route_params);
+                if (!empty($check) && preg_match('/' . $reg['reg']. '/', $check)) {
+                    self::$request->get($key, $check);
                 } else {
                     if (!isset($reg['shadow'])){
                         Log::recore('ARGV', $key . ' type error or not found');
-                        throw new ErrorException('参数错误');
+                        throw new RouteException('参数错误');
                     }
                 }
             }

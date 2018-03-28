@@ -140,7 +140,7 @@ class Request
      * @param string $default
      * @param string $callback
      * @return array|mixed|string
-     * @throws ErrorException
+     * @throws \yang\exception\RequestException
      */
     public function server($name = '', $default = '', $callback = '') {
 
@@ -162,7 +162,7 @@ class Request
      * @param string $default
      * @param string $callback
      * @return array|mixed|string
-     * @throws ErrorException
+     * @throws \yang\exception\RequestException
      */
     public function post($name, $value = '', $default = '', $callback = '') {
 
@@ -186,7 +186,7 @@ class Request
      * @param string $default
      * @param string $callback
      * @return array|mixed|string
-     * @throws ErrorException
+     * @throws \yang\exception\RequestException
      */
     public function get($name, $value = '', $default = "", $callback = '') {
         if (empty($this->get)) {
@@ -258,7 +258,7 @@ class Request
      * @access public
      * @param bool $ajax  true 获取原始ajax请求
      * @return bool
-     * @throws ErrorException
+     * @throws \yang\exception\RequestException
      */
     public function isAjax($ajax = false)
     {
@@ -276,7 +276,7 @@ class Request
      * @access public
      * @param bool $pjax  true 获取原始pjax请求
      * @return bool
-     * @throws ErrorException
+     * @throws \yang\exception\RequestException
      */
     public function isPjax($pjax = false)
     {
@@ -352,7 +352,7 @@ class Request
      * @param string $callback
      * @param string $type
      * @return array|mixed|string
-     * @throws ErrorException
+     * @throws \yang\exception\RequestException
      */
     public function filter(array $data, $name = '', $default = null, $callback = '', $type = 's') {
         if (strpos($name, ':')) {
@@ -364,7 +364,11 @@ class Request
         if (empty($callback)) {
             return $this->filterCallbakc($value, $type);
         }
-        return call_user_func([$this, $callback], $value);
+        if (method_exists($this, $callback)) {
+            return call_user_func([$this, $callback], $value);
+        } else {
+            return call_user_func($callback, $value);
+        }
     }
 
     /**
@@ -372,7 +376,7 @@ class Request
      * @param array $data
      * @param string $name
      * @param string $type
-     * @throws ErrorException
+     * @throws \yang\exception\RequestException
      */
     public function filterCallbakc($value, $type = 's') {
 
@@ -390,7 +394,7 @@ class Request
                 case 's':
                     return (string) $value;
                 default:
-                    throw new ErrorException(gettype($value) . ' Not Found This Types ');
+                    throw new \yang\exception\RequestException(gettype($value) . ' Not Found This Types ');
             }
         }
         return $value;

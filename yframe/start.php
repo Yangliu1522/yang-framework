@@ -34,6 +34,8 @@ $config['vender_path']   = $config['base_path'] . $ds . 'vendor' . $ds;
 $config['static']   = \yang\Common::path2url($config['base_path'] ) . 'public/';
 $config['runtime_path'] = $config['base_path'] . 'runtime' . $ds;
 $config['cache_path'] = $config['runtime_path'] . 'cache' . $ds;
+$config['common_path'] = $root_dir . 'common' . $ds;
+$config['config_path'] = $config['common_path'] . 'config' . $ds;
 $config['log_path'] = $config['runtime_path'] . 'log' . $ds;
 $config['tpl_cache_path'] = $config['runtime_path'] . 'template' . $ds;
 

@@ -12,7 +12,6 @@ namespace yang\template;
 
 trait SimFlag
 {
-    use SimParse;
 
     /**
      * foreach方法

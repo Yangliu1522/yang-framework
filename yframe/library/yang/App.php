@@ -49,7 +49,13 @@ class App implements \ArrayAccess
             self::$instrace = new static();
         }
         self::$request = $request !== null ? $request : Request::create();
-        self::$route = $this->route->create([], self::$request);
+        $route = [];
+
+        if (file_exists(Env::get('common_path') . 'route.php')) {
+            $route = Fastload::getContentOfFile(Env::get('common_path') . 'route.php');
+        }
+
+        self::$route = $this->route->create($route, self::$request);
         // self::$instrace->start(); 测试一下
     }
 
