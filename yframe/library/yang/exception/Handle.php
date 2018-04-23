@@ -60,10 +60,8 @@ class Handle
     public function render()
     {
         $this->show = \yang\Common::$app_debug;
-        ob_start();
+        \yang\Common::http_response_code(500);
         include \yang\Env::get('root_path') . "tpl" . DIRECTORY_SEPARATOR . "exception.php";
-        $content = ob_get_contents();
-        \yang\Response::create($content, 500)->send();
         exit();
     }
 

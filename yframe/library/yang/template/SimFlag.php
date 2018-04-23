@@ -38,7 +38,11 @@ trait SimFlag
             $match[2] = $this->parseVar($match[2]);
             // 转换变量
             //end
-            $return = '<?php if(is_array(' . $match[2] . ') || ' .$match[2]. ' instanceof \yang\model\Result): $__LIST__ = ' . $match[2] . ';foreach ($__LIST__ as ' . $match[1] . '): ?>';
+            $return = '<?php if(is_array(' . $match[2] . ')';
+            if (class_exists('\\yang\\model\\Result', false)) {
+                $return .= '|| ' . $match[2] . ' instanceof \yang\model\Result';
+            }
+            $return .= '): $__LIST__ = ' . $match[2] . ';foreach ($__LIST__ as ' . $match[1] . '): ?>';
             $this->cahce_all[md5($match[0])] = $return;
             return $return;
         }, $content);
@@ -51,25 +55,69 @@ trait SimFlag
      */
     public function forCommand($content = '')
     {
-        return preg_replace_callback('/@for(?:[\s])([\w\W]*?)as(?:[\s])([\d]+)\.([<\d>]*)\.([\d]+?)(?:[\s]*)do|@endfor;/is', function ($match) {
+        return preg_replace_callback('/@for(?:[\s])([\w\W]*?)as\s+range\(([\w\W]*?)\)(?:[\s]*):|@endf;/is', function ($match) {
+            if (isset($this->cahce_all[md5($match[0])])) {
+                return $this->cahce_all[md5($match[0])];
+            }
+            if (strpos($match[0], '@endf') === 0) {
+                return '<?php endfor; ?>';
+            }
+            $var = $this->parseVar($match[1]);
+            $range = $match[2];
+            $range = explode(',', $range);
+
+            foreach ($range as &$item) {
+                $item = trim($item);
+                if (is_numeric($item)) {
+                    $item = intval($item);
+                } else {
+                    $item = $this->parseVar($item);
+                }
+            }
+
+            if (count($range) < 3) {
+                $range[2] = 1;
+            }
+
+            if (count($range) < 4) {
+                $range[3] = '+';
+            }
+
+            list($one, $two, $count, $ar) = $range;
+
+
+            $return = '<?php' . " for ({$var} = {$one};{$var} <= {$two};{$var}{$ar}={$count}):" . ' ?>';
+            $this->cahce_all[md5($match[0])] = $return;
+            return $return;
+        }, $content);
+    }
+
+    /**
+     * foreach方法
+     * @param string $content
+     * @return mixed
+     */
+    public function foreachoCommand($content = '')
+    {
+        return preg_replace_callback('/@foro(?:[\s])([\w\W]*?)in(?:[\s])([\w\W]*?)(?:[\s]*)\:|@endfor;/is', function ($match) {
             if (isset($this->cahce_all[md5($match[0])])) {
                 return $this->cahce_all[md5($match[0])];
             }
             if (strpos($match[0], '@endfor') === 0) {
-                return '<?php endfor; ?>';
+                return '<?php endforeach;endif; ?>';
             }
-            $var = $this->parseVar($match[1]);
-            $left = $match[2];
-            $right = $match[4];
-            $c = empty($match[3]) ? '++' : '= ' . trim($match[3], '<>');
-            if (strpos($match[3], '>') !== false) {
-                $c = '+' . $c;
-                $ar = '<';
-            } else {
-                $c = '-' . $c;
-                $ar = '>';
+            if (strpos($match[1], ',')) {
+                $match[1] = explode(',', $match[1]);
+                foreach ($match[1] as &$v) {
+                    $v = trim($v);
+                }
+                $match[1] = implode(' => $', $match[1]);
             }
-            $return = '<?php' . " for ({$var} = {$left};{$var}{$ar}{$right};{$var}{$c};):" . ' ?>';
+            $match[1] = '$' . trim($match[1]);
+            $match[2] = $this->parseVar($match[2]);
+            // 转换变量
+            //end
+            $return = '<?php if(is_object(' . $match[2] . ')): $__LIST__ = ' . $match[2] . ';foreach ($__LIST__ as ' . $match[1] . '): ?>';
             $this->cahce_all[md5($match[0])] = $return;
             return $return;
         }, $content);
@@ -93,6 +141,14 @@ trait SimFlag
             $return = '<?php ' . $var . ' = ' . $condition . '; ?>';
             $this->cahce_all[md5($match[0])] = $return;
             return $return;
+        }, $content);
+    }
+
+    public function isCommand($content = "")
+    {
+        return preg_replace_callback('/@is\(([\w\W]*?)\);/i', function ($match) {
+            $this->isType = trim(strtolower($match[1]));
+            return "<!-- {$this->isType} -->";
         }, $content);
     }
 
@@ -140,12 +196,17 @@ trait SimFlag
             if (isset($this->cahce_all[md5($m[0])])) {
                 return $this->cahce_all[md5($m[0])];
             }
-            $var = $this->parseVar($m[1]);;
+            $var = $this->parseVar($m[1]);
             if (strpos($var, '!') === 0) {
                 $return = '<?php echo ' . $this->parseFunc(trim($var, '!')) . '; ?>';
             } else {
-                $return = '<?php echo htmlentities(' .  $this->parseFunc($var) . '); ?>';
+                if (strpos($var, '#') === 0) {
+                    $return = '<?php ' . $this->parseFunc(trim($var, '#')) . '; ?>';
+                } else {
+                    $return = '<?php echo htmlentities(' . $this->parseFunc($var) . '); ?>';
+                }
             }
+
             $this->cahce_all[md5($m[0])] = $return;
             return $return;
         }, $content);
@@ -158,15 +219,18 @@ trait SimFlag
     public function loadtagCommand($content = '')
     {
         return preg_replace_callback('/@loadtag\s+([\w\W]*?);/i', function ($match) {
-            $req = \yang\Request::create();
-            $module = $req->module();
+            $module = '';
+            if (class_exists('\\yanh\\Request', false)) {
+                $req = \yang\Request::create();
+                $module = '\\' . $req->module();
+            }
             $name = trim($match[1]);
             if (strpos($name, '/')) {
-                $name = explode('/', $name,2);
+                $name = explode('/', $name, 2);
                 $module = $name[0];
                 $name = str_replace('/', '\\', end($name));
             }
-            $class = '\\app\\' . $module . '\\taglib\\' . ucfirst($name);
+            $class = '\\' . \Env::get('app_name') . $module . '\\taglib\\' . ucfirst($name);
 
             $this->loadTag[ucfirst($name)] = $class;
             return "<!-- Load TagLib -->";

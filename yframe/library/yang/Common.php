@@ -181,15 +181,7 @@ class Common
 
     public static function wurl($url, $extentd = '') {
         global $_W;
-        $url = explode('.', $url, 2);
-        if (count($url) > 1) {
-            $query = [
-                'op' => end($url)
-            ];
-        } else {
-            $query = [
-            ];
-        }
+        $query = [];
         $params = array_merge($query, array(
             'm' => strtolower(Env::get("modulename")),
             'uniacid' => $_W['uniacid'],
@@ -197,7 +189,7 @@ class Common
             'a'  => 'entry'
         ));
         if (!empty($url)) {
-            $params['do'] = $url[0];
+            $params['do'] = $url;
         }
         $url = "./index.php?";
         $queryString = http_build_query($params, '', '&');
@@ -210,22 +202,14 @@ class Common
     public static function murl($murl, $extentd = '', $noredirect = false) {
         global $_W;
         $url = '/app/';
-        $murl = explode('.', $murl, 2);
-        if (count($murl) > 1) {
-            $query = [
-                'op' => end($murl)
-            ];
-        } else {
-            $query = [
-            ];
-        }
+        $query = [];
         $params = array_merge($query, array(
             'm' => strtolower(Env::get("modulename")),
             'i' => $_W['uniacid'],
             'c'  => 'entry'
         ));
         if (!empty($murl)) {
-            $params['do'] = $murl[0];
+            $params['do'] = $murl;
         }
         $url .= "index.php?";
         $queryString = http_build_query($params, '', '&');
@@ -236,12 +220,6 @@ class Common
         return $url;
     }
 
-    public static function sqlerror() {
-        $error = pdo_debug(false);
-        $error = end($error);
-        Log::recore('sql', $error);
-    }
-
     public static function humpToDot($str){
         $str = lcfirst($str);
         if (preg_match('/([A-Z]{1})/',$str)){
@@ -250,5 +228,27 @@ class Common
             },$str);
         }
         return $str;
+    }
+
+    /**
+     * @param $callback
+     * @return \yang\Model
+     */
+    public static function model($callback) {
+        $callback = explode('/', trim($callback, '/'));
+
+        array_splice($callback,0,0,Env::get('app_name'));
+        array_splice($callback,2,0,'model');
+
+        $class = implode('\\', $callback);
+        return new $class;
+    }
+
+    /**
+     * @param $callback
+     * @return \yang\Model
+     */
+    public static function table($callback) {
+        return Db::table($callback);
     }
 }

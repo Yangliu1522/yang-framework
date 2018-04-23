@@ -92,7 +92,7 @@ class Validate
     {
         $data = '';
         $rules = array();
-        $value = isset($this->data[$k]) ? $this->data[$k] : '';
+        $value = $this->data[$k] ? $this->data[$k] : '';
         $this->tdata[$k] = $value;
         if (is_array($rule)) {
             foreach ($rule as $v) {
@@ -214,7 +214,7 @@ class Validate
                 break;
             case 'reval':
                 $v = $this->c_attr($v, 1);
-                $c = isset($this->data[$v])?$this->data[$v]:'';
+                $c = $this->data[$v] ?$this->data[$v]:'';
                 $result = strcmp($c, $value) === 0;
                 break;
             case 'max':
@@ -290,7 +290,7 @@ class Validate
         if (is_string($rule) && strpos($rule, ',')) {
             list($rule, $param) = explode(',', $rule);
         } elseif (is_array($rule)) {
-            $param = isset($rule[1]) ? $rule[1] : null;
+            $param = $rule[1] ? $rule[1] : null;
             $rule  = $rule[0];
         } else {
             $param = null;
@@ -300,7 +300,7 @@ class Validate
 
     public function regex($value, $rule)
     {
-        if (isset($this->rule[$rule])) {
+        if ($this->rule[$rule]) {
             $rule = $this->rule[$rule];
         }
         if (0 !== strpos($rule, '/') && !preg_match('/\/[imsU]{0,4}$/', $rule)) {
@@ -313,7 +313,7 @@ class Validate
 
     public function messages()
     {
-        $message = isset($this->default_message[$this->error_messages]) ? $this->default_message[$this->error_messages] : $this->error_messages;
+        $message = $this->default_message[$this->error_messages] ? $this->default_message[$this->error_messages] : $this->error_messages;
         return str_replace([
             ':rule',':name',':attr'
         ], [

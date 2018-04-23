@@ -25,14 +25,14 @@ class Error {
             // 设置php.ini里的内容 这里是打开错误提示
             ini_set('display_errors', 'On');
             // 设置显示的错误级别 E_ALL 就是全部 E_ALL&~E_WARNING 这样就是显示除了warning的错误
-            error_reporting(E_ALL&~E_NOTICE);// 忘了打开
+            error_reporting(E_ALL&~E_NOTICE&~E_WARNING);// 忘了打开
         } else {
             ini_set('display_errors', 'Off');
         }
         // 设置出现异常事调用的函数
         set_exception_handler([$this, 'exception']);
         // 设置出现错误时调用的函数
-        set_error_handler([$this, 'error'], ~E_NOTICE);
+        set_error_handler([$this, 'error'], ~E_NOTICE&~E_WARNING);
         // 设置程序结束后执行的错误
         register_shutdown_function([$this, 'shutdown']);
     }

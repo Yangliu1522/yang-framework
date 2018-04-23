@@ -12,6 +12,7 @@ namespace yang;
 use yang\exception\FileNotFoundException;
 
 class Template extends template\SimInterface {
+    protected $isType = 'array';
     use template\SimFlag;
     private $file_list = [], $cache_file = '', $content, $cache_content, $loadTag = [];
     private static $cache_static;
@@ -89,10 +90,12 @@ class Template extends template\SimInterface {
      * 转换模板内容
      */
     private function convertContent(&$content) {
+        $content = $this->isCommand($content);
         $content = $this->includeCommand($content);
         $content = $this->loadtagCommand($content);
         $content = $this->showVar($content);
         $content = $this->foreachCommand($content);
+        $content = $this->forCommand($content);
         $content = $this->setCommand($content);
         $content = $this->ifCommand($content);
         $content = $this->envCommand($content);
@@ -104,7 +107,7 @@ class Template extends template\SimInterface {
     {
         return preg_replace_callback('/@include\s+([\w\W]*?)(?:[\s]*);/i', function ($mathc) {
             // 此处不做结尾逗号的清理
-            if (isset($this->cahce_all[md5($mathc[0])])) {
+            if ($this->cahce_all[md5($mathc[0])]) {
                 return $this->cahce_all[md5($mathc[0])];
             }
             $file = $mathc[1];
